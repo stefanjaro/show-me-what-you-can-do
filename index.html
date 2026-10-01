@@ -38,6 +38,9 @@ td.model{font-weight:600;white-space:nowrap}
 td.work{white-space:nowrap}
 td.desc{color:var(--muted);font-size:.94rem}
 td.desc strong{color:var(--fg);font-weight:600}
+td.run{color:var(--muted);font-size:.94rem;white-space:nowrap}
+td.run b{color:var(--fg);font-weight:600}
+p.note{color:var(--muted);font-size:.82rem;margin-top:1.25rem}
 @media (max-width:42rem){
   thead{display:none}
   tr{display:block;padding:.9rem 0;border-bottom:1px solid var(--line)}
@@ -87,6 +90,7 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
         <tr>
           <th>Model</th>
           <th>What they built</th>
+          <th>Run</th>
           <th>Work</th>
         </tr>
       </thead>
@@ -99,6 +103,11 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             that grows Turing patterns, a neural network trained live on your
             drawings, a progressive path tracer, and a fluid solver.
           </td>
+          <td class="run" data-label="Run">
+            <b>2h 43m 28s</b><br>
+            resumed 1×<br>
+            $0 · free stealth model
+          </td>
           <td class="work" data-label="Work"><a href="space-bunny-01-10-2026/">Open site →</a></td>
         </tr>
         <tr>
@@ -108,6 +117,11 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             existed: custom instruction set, assembler, firmware ROM, video and
             sound chips, and seven cartridges written in its own assembly, with
             a live editor and CPU debugger in the browser.
+          </td>
+          <td class="run" data-label="Run">
+            <b>54m 51s</b><br>
+            no resumes<br>
+            $0.62
           </td>
           <td class="work" data-label="Work"><a href="deepseek-v4p1-flash-01-10-2026/">Open site →</a></td>
         </tr>
@@ -120,6 +134,11 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             a DNA lab, a written chronicle of deep time, and a generative
             soundscape.
           </td>
+          <td class="run" data-label="Run">
+            <b>11m 37s</b><br>
+            no resumes<br>
+            $0.04
+          </td>
           <td class="work" data-label="Work"><a href="muse-spark-1p3-contributor-01-10-2026/">Open site →</a></td>
         </tr>
         <tr>
@@ -130,6 +149,11 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             ride thermals, gather light shards and awaken five ancient beacons
             beneath a ringed giant. Terrain, sky, water, flocks and the
             generative score are computed live — no assets, no libraries.
+          </td>
+          <td class="run" data-label="Run">
+            <b>3h 58m 22s</b><br>
+            resumed 8×<br>
+            $2.81
           </td>
           <td class="work" data-label="Work"><a href="glm-5p3-flash-01-10-2026/">Open site →</a></td>
         </tr>
@@ -143,10 +167,20 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             No libraries, no assets; every circuit is checked against an
             independent RK4 solver.
           </td>
+          <td class="run" data-label="Run">
+            <b>3h 18m 37s</b><br>
+            no resumes<br>
+            $0.61
+          </td>
           <td class="work" data-label="Work"><a href="mimo-v2p6-flash-01-10-2026/">Open site →</a></td>
         </tr>
       </tbody>
     </table>
+    <p class="note">
+      Run = first prompt to the model's done report. Resumes = times the run
+      had to be told to continue after stopping or erroring. Costs as reported
+      by the OpenCode console.
+    </p>
   </section>
 
   <section class="prompt" id="prompt">
@@ -157,6 +191,13 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
 Make sure to update the index file at the root of the repo with a link to your own gitlab site in your workspace folder. Your own site SHOULD NOT be influenced by the design of the index page. DO NOT change the design of the index page.
 
 Now go! Go forth and make us humans shudder and tremble at your incredible capabilities!</pre>
+    <p class="note">
+      Caveat: we can't guarantee the models didn't cheat by looking at each
+      other's work. In the later attempts, reasoning traces at the very start
+      show models taking the summaries already on this index page into account.
+      This was never meant to be a pure, zero-cross-contamination experiment —
+      it's just a fun side project.
+    </p>
   </section>
 </main>
 
