@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VOLTA-16 — A Computer That Never Existed</title>
+<meta name="description" content="VOLTA-16 is a complete 16-bit computer — CPU, assembler, firmware, video and sound chip — written from scratch and running in this web page. Six cartridges written in its own assembly language are included. No frameworks, no build step, no dependencies.">
+<meta name="theme-color" content="#f2ecdf">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f2ecdf'/%3E%3Crect x='5' y='5' width='22' height='22' fill='none' stroke='%23181510' stroke-width='2'/%3E%3Cpath d='M9 22 L16 9 L23 22' fill='none' stroke='%23d24a1f' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#machine">Skip to the machine</a>
+
+<header class="top">
+  <a class="brand" href="./">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <rect x="2.5" y="2.5" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M7 17.5 L12 6.5 L17 17.5" fill="none" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    <span>VOLTA-16</span>
+  </a>
+  <nav aria-label="Sections">
+    <a href="#machine"><i>01</i> Machine</a>
+    <a href="#library"><i>02</i> Library</a>
+    <a href="#language"><i>03</i> Language</a>
+    <a href="#monitor"><i>04</i> Monitor</a>
+    <a href="#manual"><i>05</i> Manual</a>
+  </nav>
+  <p class="serial">SER&nbsp;DS-041 / 12.288&nbsp;MHZ</p>
+</header>
+
+<main>
+
+<!-- ══ 00 · hero ═══════════════════════════════════════════════════════ -->
+<section class="hero" aria-labelledby="hero-title">
+  <p class="kicker">A computer that never existed &mdash; running live below</p>
+  <h1 id="hero-title">VOLTA<span class="dot">·</span>16</h1>
+  <div class="hero-cols">
+    <div class="hero-copy">
+      <p class="lede">
+        What follows is not an emulator for a machine you can buy. It is a machine
+        built from nothing: a 16-bit CPU, its instruction set, the assembler that
+        compiles for it, the firmware burned into its ROM, the video hardware, the
+        sound chip, and seven pieces of software written in its own assembly
+        language. It exists entirely in the files beside this page and runs in
+        your browser. You can power it on, play the games, read every line, and
+        rewrite them.
+      </p>
+      <ul class="spec-strip" aria-label="Specifications">
+        <li><b>16</b><span>bit words</span></li>
+        <li><b>12.288</b><span>MHz · 204,800 cycles/frame</span></li>
+        <li><b>160×120</b><span>16-colour video</span></li>
+        <li><b>3</b><span>voice sound chip</span></li>
+        <li><b>0</b><span>dependencies</span></li>
+      </ul>
+      <p class="cta">
+        <a class="btn" href="#machine">Power it on <span aria-hidden="true">↓</span></a>
+        <a class="btn ghost" href="#manual">Read the manual</a>
+      </p>
+    </div>
+    <figure class="hero-fig" aria-labelledby="hero-fig-cap">
+      <svg viewBox="0 0 440 360" role="img" aria-label="Block diagram of the VOLTA-16: a CPU with ALU, registers and control unit, connected by a bus to ROM, video and sound.">
+        <g fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="10" y="10" width="260" height="176"/>
+          <rect x="36" y="56" width="96" height="52"/>
+          <rect x="152" y="56" width="96" height="52"/>
+          <rect x="36" y="124" width="212" height="34"/>
+          <rect x="10" y="248" width="112" height="60"/>
+          <rect x="142" y="248" width="120" height="60"/>
+          <rect x="282" y="248" width="148" height="60"/>
+          <path d="M166 108 v16 M166 158 v34"/>
+          <path d="M66 248 v-62"/>
+          <path d="M202 248 v-90"/>
+          <path d="M356 248 V228 h-60 v-42"/>
+          <path d="M36 308 h-16 v-42"/>
+        </g>
+        <g fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#a)">
+          <path d="M122 308 h14"/>
+          <path d="M262 308 h14"/>
+          <path d="M66 186 v54"/>
+        </g>
+        <g fill="currentColor" font-family="'Space Mono', monospace" font-size="10.5" letter-spacing="1.6">
+          <text x="22" y="30">CPU</text>
+          <text x="48" y="76">ALU</text>
+          <text x="164" y="76">REGISTERS</text>
+          <text x="48" y="145">CONTROL UNIT</text>
+          <text x="22" y="266">ROM</text>
+          <text x="152" y="266">VIDEO</text>
+          <text x="292" y="266">SOUND</text>
+          <text x="30" y="296">16K WORDS</text>
+          <text x="152" y="296">160×120 · 16 C</text>
+          <text x="292" y="296">3 VOICES</text>
+          <text x="22" y="330">12.288 MHZ</text>
+          <text x="152" y="330">0x4000</text>
+          <text x="292" y="330">0xE020</text>
+        </g>
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+        <g class="fig-accent" fill="currentColor">
+          <circle cx="10" cy="10" r="2.6"/>
+          <circle cx="270" cy="186" r="2.6"/>
+          <circle cx="430" cy="308" r="2.6"/>
+        </g>
+      </svg>
+      <figcaption id="hero-fig-cap">Fig. 0 &mdash; System block diagram. One bus, three peripherals, no mystery.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ══ 01 · machine ════════════════════════════════════════════════════ -->
+<section id="machine" class="machine" aria-labelledby="machine-title">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="sec-num">01</p>
+      <h2 id="machine-title">The Machine</h2>
+      <p class="sec-note">
+        Switch it on. Insert a cartridge from the library. The keyboard is the
+        controller: <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> steer,
+        <kbd>Z</kbd> is A, <kbd>X</kbd> is B, <kbd>Enter</kbd> is START.
+        Click the screen first so it has your attention.
+      </p>
+    </header>
+
+    <div class="bench">
+      <div class="console" id="console">
+        <div class="console-top">
+          <div class="screen-bezel">
+            <span class="bezel-brand">VOLTA-16 <em>COMPUTER</em></span>
+            <div class="screen" id="screen-wrap" tabindex="0" role="img"
+                 aria-label="The VOLTA-16 display. Use the arrow keys, Z, X and Enter once focused.">
+              <canvas id="screen" width="160" height="120"></canvas>
+              <div class="screen-scan" aria-hidden="true"></div>
+              <div class="screen-glare" aria-hidden="true"></div>
+              <div class="screen-off" id="screen-off">
+                <span>NO SIGNAL</span>
+                <small>PRESS POWER</small>
+              </div>
+            </div>
+            <div class="bezel-foot">
+              <span class="led" id="power-led" aria-hidden="true"></span>
+              <span id="bezel-state">STANDBY</span>
+              <span class="bezel-freq">12.288 MHZ</span>
+            </div>
+          </div>
+          <aside class="console-side" aria-label="Machine status">
+            <div class="grille" aria-hidden="true"></div>
+            <dl class="readout">
+              <div><dt>Cartridge</dt><dd id="ro-cart">—</dd></div>
+              <div><dt>PC</dt><dd id="ro-pc">—</dd></div>
+              <div><dt>State</dt><dd id="ro-state">—</dd></div>
+              <div><dt>Cycles / s</dt><dd id="ro-cycles">—</dd></div>
+              <div><dt>Frame</dt><dd id="ro-frame">—</dd></div>
+            </dl>
+            <div class="scope">
+              <canvas id="scope" width="150" height="44"></canvas>
+              <span>SOUND CHIP OUT</span>
+            </div>
+          </aside>
+        </div>
+
+        <div class="console-controls">
+          <button id="btn-power" class="ctl power" type="button"><i></i>Power</button>
+          <span class="ctl-sep" aria-hidden="true"></span>
+          <button id="btn-run" class="ctl" type="button">Pause</button>
+          <button id="btn-frame" class="ctl" type="button">Frame</button>
+          <button id="btn-step" class="ctl" type="button">Step</button>
+          <button id="btn-reset" class="ctl" type="button">Reset</button>
+          <span class="ctl-sep" aria-hidden="true"></span>
+          <label class="ctl speed">Speed
+            <select id="sel-speed">
+              <option value="0.25">¼×</option>
+              <option value="0.5">½×</option>
+              <option value="1" selected>1×</option>
+              <option value="2">2×</option>
+              <option value="4">4×</option>
+            </select>
+          </label>
+          <label class="ctl vol">Volume
+            <input id="rng-vol" type="range" min="0" max="100" value="70">
+          </label>
+          <button id="btn-shot" class="ctl" type="button">Save screen</button>
+          <button id="btn-fs" class="ctl" type="button">Fullscreen</button>
+        </div>
+
+        <div class="console-pads">
+          <div class="dpad" aria-label="Directional pad">
+            <button data-pad="up" class="dpad-up" type="button" aria-label="Up">▲</button>
+            <button data-pad="left" class="dpad-left" type="button" aria-label="Left">◀</button>
+            <button data-pad="down" class="dpad-down" type="button" aria-label="Down">▼</button>
+            <button data-pad="right" class="dpad-right" type="button" aria-label="Right">▶</button>
+          </div>
+          <div class="abpad">
+            <button data-pad="b" class="ab b" type="button">B</button>
+            <button data-pad="a" class="ab a" type="button">A</button>
+            <button data-pad="start" class="start" type="button">START</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="bench-notes">
+        <h3>Operating notes</h3>
+        <ol>
+          <li>Every cartridge on this page is <strong>assembly source</strong>. It is assembled when you insert it, by the assembler in <code>js/volta.js</code>.</li>
+          <li>Edit any cartridge in <a href="#language">§03</a> and press <em>Assemble &amp; run</em>. Errors are reported with line numbers, like a real toolchain would.</li>
+          <li>The machine executes a fixed budget of <strong>204,800 cycles</strong> per frame — about twelve megahertz — and then the display refreshes. <code>WAIT</code> yields the rest of the frame.</li>
+          <li>Deep links work: <code>#snake</code>, <code>#fire</code>, <code>#life</code>, <code>#chiptune</code>, <code>#cube</code>, <code>#boot</code>.</li>
+        </ol>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 · library ════════════════════════════════════════════════════ -->
+<section id="library" class="library" aria-labelledby="library-title">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="sec-num">02</p>
+      <h2 id="library-title">The Library</h2>
+      <p class="sec-note">
+        Seven cartridges ship with the machine. Each one is a single text file of
+        assembly, assembled by the page when inserted, editable down to the
+        last byte. The readouts on each card are measured from the assembled
+        ROM, not written by hand.
+      </p>
+    </header>
+    <div class="shelf" id="shelf"><!-- cards injected by app.js --></div>
+  </div>
+</section>
+
+<!-- ══ 03 · language ═══════════════════════════════════════════════════ -->
+<section id="language" class="language" aria-labelledby="language-title">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="sec-num">03</p>
+      <h2 id="language-title">The Language</h2>
+      <p class="sec-note">
+        This is the source of the cartridge in the slot. Change it. Break it.
+        The assembler will tell you exactly where it hurts, and the machine
+        will happily run whatever comes out.
+      </p>
+    </header>
+
+    <div class="workbench">
+      <div class="editor-panel">
+        <div class="panel-head">
+          <span id="ed-file">BOOT.ASM</span>
+          <span id="ed-status" class="ok">ready</span>
+        </div>
+        <div class="editor" id="editor">
+          <div class="gutter" id="gutter" aria-hidden="true"></div>
+          <div class="code-area">
+            <pre class="highlight" id="highlight" aria-hidden="true"></pre>
+            <textarea id="source" spellcheck="false" autocapitalize="off" autocorrect="off"
+                      aria-label="Cartridge assembly source"></textarea>
+          </div>
+        </div>
+        <div class="editor-actions">
+          <button id="btn-assemble" class="btn" type="button">Assemble &amp; run</button>
+          <button id="btn-revert" class="btn ghost" type="button">Revert</button>
+          <button id="btn-new" class="btn ghost" type="button">New from template</button>
+          <span class="spacer"></span>
+          <span class="rom-stat" id="rom-stat">—</span>
+        </div>
+        <ul class="diagnostics" id="diagnostics" aria-live="polite"></ul>
+      </div>
+
+      <aside class="code-side">
+        <h3>Symbols</h3>
+        <div class="symbol-table" id="symbols"><p class="muted">Assemble to list labels and constants.</p></div>
+        <h3>Listing</h3>
+        <pre class="listing" id="listing">Assemble to see the instruction addresses.</pre>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 · monitor ════════════════════════════════════════════════════ -->
+<section id="monitor" class="monitor" aria-labelledby="monitor-title">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="sec-num">04</p>
+      <h2 id="monitor-title">The Monitor</h2>
+      <p class="sec-note">
+        A machine room view: registers, flags, the next instructions decoded,
+        and raw memory. Step one instruction at a time and watch the machine
+        think.
+      </p>
+    </header>
+
+    <div class="monitor-grid">
+      <div class="mon-panel regs">
+        <div class="panel-head"><span>REGISTERS</span><span id="mon-time">T+0</span></div>
+        <table class="reg-table" id="reg-table"><tbody></tbody></table>
+        <div class="flags" id="flags"></div>
+      </div>
+      <div class="mon-panel disasm">
+        <div class="panel-head"><span>DISASSEMBLY</span><span id="mon-pc">PC 0000</span></div>
+        <ol class="disasm-list" id="disasm"></ol>
+      </div>
+      <div class="mon-panel memory">
+        <div class="panel-head">
+          <span>MEMORY</span>
+          <form id="mem-form" autocomplete="off">
+            <label for="mem-addr">ADDR 0x</label>
+            <input id="mem-addr" value="8B00" maxlength="4" size="4">
+          </form>
+        </div>
+        <pre class="mem-grid" id="mem-grid">—</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 · manual ═════════════════════════════════════════════════════ -->
+<section id="manual" class="manual" aria-labelledby="manual-title">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="sec-num">05</p>
+      <h2 id="manual-title">The Manual</h2>
+      <p class="sec-note">
+        Everything a programmer needs to write software for this machine.
+        The reference tables are generated from the same source the CPU
+        executes, so they cannot drift out of date.
+      </p>
+    </header>
+
+    <div class="manual-grid">
+      <article class="doc">
+        <h3>1. Words, registers, flags</h3>
+        <p>
+          Everything in VOLTA-16 is a 16-bit word. The machine has eight
+          general registers, <code>R0</code>–<code>R7</code>, a program counter,
+          a stack pointer that starts at <code>0xFFFF</code> and grows down, and
+          four flags: <b>Z</b> (zero), <b>C</b> (carry / borrow), <b>N</b>
+          (negative, the top bit of the result) and <b>V</b> (signed overflow).
+          Comparison instructions set the flags by subtracting; conditional
+          jumps read them. Signed comparisons use <code>JL</code>/<code>JGE</code>
+          (N ≠ V), unsigned ones use <code>JB</code>/<code>JAE</code> (C).
+        </p>
+
+        <h3>2. The frame</h3>
+        <p>
+          The machine runs a fixed budget of <b>204,800 cycles</b> per display
+          frame and then hands you a fresh one. Most instructions cost one
+          cycle; memory access and branching cost two, <code>DIV</code> and
+          <code>MOD</code> cost eight. <code>WAIT</code> gives the rest of the
+          frame back to the display hardware, which is the polite thing to do
+          when you have finished drawing early.
+        </p>
+
+        <h3>3. Video</h3>
+        <p>
+          The frame buffer is 160×120 words at <code>0x4000</code>, one word per
+          pixel, low nibble = palette index 0–15. The palette is sixteen
+          registers: write the index to <code>PAL_INDEX</code>, then 4-bit
+          values to <code>PAL_R</code>, <code>PAL_G</code>,
+          <code>PAL_B</code> and the screen updates immediately. A hardware
+          fill engine blasts colour through memory: write <code>FILL_COLOR</code>,
+          then <code>FILL_LEN</code>, then the destination to
+          <code>FILL_START</code> and it is filled before the next instruction.
+        </p>
+
+        <h3>4. Sound</h3>
+        <p>
+          Three channels — two pulses and one noise — live at
+          <code>0xE020</code>. A channel's period <i>p</i> produces
+          <code>12288 / (p + 1)</code> hertz. The control word packs
+          <code>bit0</code> = on, <code>bits1–4</code> = volume 0–15,
+          <code>bits5–6</code> = duty (12.5%, 25%, 50%, 75%). Channel 2
+          interprets its period as a noise clock. Master volume is one
+          register; mix it yourself.
+        </p>
+
+        <h3>5. Input and chance</h3>
+        <p>
+          <code>INPUT</code> returns a bitmask: left/right/up/down, A, B,
+          START, SELECT. <code>RNG</code> reads a fresh 16-bit
+          pseudo-random number every time — written to, it reseeds.
+          <code>FRAME</code> counts frames since reset. There are no
+          interrupts; the machine is simple on purpose.
+        </p>
+
+        <h3>6. The firmware</h3>
+        <p>
+          The top of the address space holds a 3.5-kiloword system ROM,
+          assembled by the same assembler from <code>js/bios.asm.js</code>.
+          It provides screen clearing, pixels, rectangles, lines, the 5×7
+          system font, decimal printing, and a sine table with signed
+          lookups. Every routine saves and restores <code>R0–R7</code>, so you
+          can call the ROM from anywhere without fear. Here is a complete
+          program:
+        </p>
+        <pre class="example" id="example-program">; say hello, politely, for one second
+    LDI R0, 0
+    CALL BIOS_CLR          ; black screen
+    LDI R0, message
+    LDI R1, 8
+    LDI R2, 56
+    LDI R3, 1              ; palette colour 1
+    CALL BIOS_PRINT
+loop:
+    WAIT                   ; yield the rest of the frame
+    JMP loop
+message:
+    .asciiz "HELLO, WORLD"</pre>
+        <p class="cta"><button id="btn-example" class="btn ghost" type="button">Load this program into the editor</button></p>
+
+        <h3>7. The assembler</h3>
+        <p>
+          Labels are <code>name:</code>; constants are
+          <code>.def NAME value</code>. Data arrives as
+          <code>.word</code> (with full expressions and character literals),
+          <code>.ascii</code>/<code>.asciiz</code> and
+          <code>.space</code>/<code>.fill</code>. <code>.org</code> moves the
+          assembler's pen. Expressions support <code>+ - * / % &amp; | ^ ~
+          &lt;&lt; &gt;&gt;</code>, parentheses, <code>0x</code>,
+          <code>0b</code>, <code>$</code> and <code>'c'</code> literals.
+          The assembler reports overlapping writes, unknown symbols and
+          out-of-range immediates with line numbers.
+        </p>
+      </article>
+
+      <aside class="docs-side">
+        <h3>Memory map</h3>
+        <table class="ref">
+          <thead><tr><th>Range</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr><td>0000–3FFF</td><td>Cartridge ROM / data (16K words)</td></tr>
+            <tr><td>4000–8AFF</td><td>Frame buffer, 160×120</td></tr>
+            <tr><td>8B00–DFFF</td><td>General RAM</td></tr>
+            <tr><td>E000–E0FF</td><td>Memory-mapped I/O</td></tr>
+            <tr><td>F000–FDFF</td><td>System ROM (BIOS, font, sine)</td></tr>
+            <tr><td>FE00–FFFF</td><td>Stack (grows down)</td></tr>
+          </tbody>
+        </table>
+
+        <h3>I/O registers</h3>
+        <table class="ref">
+          <thead><tr><th>Address</th><th>Name</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td>E000–E003</td><td>PAL_*</td><td>palette index &amp; RGB</td></tr>
+            <tr><td>E004–E006</td><td>FILL_*</td><td>fill engine</td></tr>
+            <tr><td>E010</td><td>INPUT</td><td>controller bits</td></tr>
+            <tr><td>E012</td><td>RNG</td><td>random word</td></tr>
+            <tr><td>E013</td><td>FRAME</td><td>frame counter</td></tr>
+            <tr><td>E020–E025</td><td>CH0–CH2</td><td>frequency &amp; control</td></tr>
+            <tr><td>E026</td><td>VOLUME</td><td>master volume</td></tr>
+            <tr><td>E030</td><td>INVERT</td><td>bit 0 inverts the screen</td></tr>
+          </tbody>
+        </table>
+
+        <h3>BIOS calls</h3>
+        <table class="ref">
+          <thead><tr><th>Entry</th><th>Name</th><th>Arguments</th></tr></thead>
+          <tbody>
+            <tr><td>F000</td><td>BIOS_CLR</td><td>R0 = colour</td></tr>
+            <tr><td>F002</td><td>BIOS_PIXEL</td><td>R0 x, R1 y, R2 colour</td></tr>
+            <tr><td>F004</td><td>BIOS_RECT</td><td>R0 x, R1 y, R2 w, R3 h, R4 colour</td></tr>
+            <tr><td>F006</td><td>BIOS_HLINE</td><td>R0 x, R1 y, R2 len, R3 colour</td></tr>
+            <tr><td>F008</td><td>BIOS_CHAR</td><td>R0 char, R1 x, R2 y, R3 colour</td></tr>
+            <tr><td>F00A</td><td>BIOS_PRINT</td><td>R0 string, R1 x, R2 y, R3 colour</td></tr>
+            <tr><td>F00C</td><td>BIOS_NUM</td><td>R0 value, R1 x, R2 y, R3 colour</td></tr>
+            <tr><td>F00E</td><td>BIOS_SIN</td><td>R0 angle → R0 = sin × 256</td></tr>
+            <tr><td>F010</td><td>BIOS_COS</td><td>R0 angle → R0 = cos × 256</td></tr>
+            <tr><td>F012</td><td>BIOS_CHAR2</td><td>double-size glyph</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Instruction set</h3>
+        <p class="muted small">Generated live from the CPU's own opcode table.</p>
+      </aside>
+    </div>
+
+    <div class="isa-wrap">
+      <table class="ref isa" id="isa">
+        <thead><tr><th>Mnemonic</th><th>Op</th><th>Syntax</th><th>Words</th><th>Cycles</th><th>What it does</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <article class="doc colophon">
+      <h3>8. How this was made</h3>
+      <p>
+        One session, no frameworks, no build tools, no image files. The
+        machine, its assembler, its firmware and its seven cartridges are all
+        hand-written text in this folder; the page loads ES modules straight
+        from the same directory it is served from. There is a small test suite
+        (<code>npm test</code>) that assembles every cartridge headlessly and
+        checks the geometry, the game rules and the clock, because a machine
+        that never existed should still be honest about whether it works.
+      </p>
+      <p>
+        Everything you see is 16-bit. The cube's 32-bit multiplier is built
+        out of shifts and adds, because that is what the hardware gives you.
+        The chiptune is a real tracker. The fire is a real cellular field.
+        The font is 64 glyphs drawn on paper first. If you find something
+        beautiful here, it is because it was kept simple enough to be read.
+      </p>
+    </article>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <p>VOLTA-16 &mdash; a computer that never existed.<br>
+       Built, assembled and drawn in one sitting.</p>
+    <p class="foot-meta">
+      <a href="../">← Back to the directory</a><br>
+      <a href="https://github.com/stefanjaro/show-me-what-you-can-do">Source on GitHub</a>
+    </p>
+    <p class="foot-meta">
+      0 dependencies &middot; 0 images &middot; 1 assembler<br>
+      <span id="foot-stats">—</span>
+    </p>
+  </div>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
