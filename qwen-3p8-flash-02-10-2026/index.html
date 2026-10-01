@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CANTUS MACHINA — the machine that composes forever</title>
+<meta name="description" content="An endless generative orchestra. Every bar of the piece is computed from the seed; every sound is synthesized live in your browser. No samples, no libraries, no network.">
+<meta property="og:title" content="CANTUS MACHINA — an endless orchestra that composes itself">
+<meta property="og:description" content="A seeded, deterministic, infinite composition — theory engine, motif development, and a full additive/FM/subtractive synthesis rig rendered live in Web Audio. No samples. No libraries.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="css/console.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='none' stroke='%23f2b134' stroke-width='8'/><circle cx='50' cy='50' r='12' fill='%23f2b134'/></svg>">
+</head>
+<body>
+
+<div id="intro" class="intro">
+  <div class="intro-inner">
+    <div class="intro-kicker">engine cm-1 · one prompt · zero libraries</div>
+    <h1 class="wordmark">CANTUS&nbsp;MACHINA</h1>
+    <p class="intro-sub">
+      an endless orchestra that composes itself — forever, differently,
+      and exactly the same every time
+    </p>
+    <p class="intro-opus">presenting <em id="opusTitleIntro">…</em></p>
+    <button id="startBtn2" class="big-start" aria-label="start the engine">
+      ▶ start the engine
+    </button>
+    <p class="intro-fine">
+      every sound you are about to hear is being built out of nothing, in your
+      browser, right now. the piece has no recordings. it has seeds.
+      headphones recommended; the room is simulated and it is a good one.
+    </p>
+  </div>
+</div>
+
+<header class="masthead">
+  <div>
+    <div class="wordmark small">CANTUS MACHINA</div>
+    <div class="opus-line"><em id="opusTitle">…</em> · <span id="opusNo">OPUS</span></div>
+  </div>
+  <div class="engine-tag" id="statusLine">engine asleep</div>
+</header>
+
+<main>
+  <section class="console" aria-label="console">
+    <div class="panel transport-panel">
+      <div class="panel-title">TRANSPORT</div>
+      <div class="transport-row">
+        <button id="playBtn" class="dial" aria-label="play">
+          <span class="dial-tri"></span>
+          <svg viewBox="0 0 100 100" class="dial-ring"><circle cx="50" cy="50" r="46"/></svg>
+        </button>
+        <div class="lamps">
+          <div class="lamps-title">VOICES</div>
+          <div class="lamp-row"><i id="lamp-pad" class="lamp"></i><span>pad</span></div>
+          <div class="lamp-row"><i id="lamp-bass" class="lamp"></i><span>bass</span></div>
+          <div class="lamp-row"><i id="lamp-pluck" class="lamp"></i><span>pluck</span></div>
+          <div class="lamp-row"><i id="lamp-lead" class="lamp"></i><span>lead</span></div>
+          <div class="lamp-row"><i id="lamp-bell" class="lamp"></i><span>chimes</span></div>
+          <div class="lamp-row"><i id="lamp-perc" class="lamp"></i><span>perc</span></div>
+          <div class="lamp-row"><i id="lamp-wind" class="lamp"></i><span>wind</span></div>
+          <div class="lamp-row"><i id="lamp-fx" class="lamp"></i><span>fx</span></div>
+        </div>
+      </div>
+      <label class="vol">
+        <span>VOLUME</span>
+        <input id="vol" type="range" min="0" max="110" value="86">
+      </label>
+      <div class="meters">
+        <div class="meter"><label>ENERGY</label><div class="meter-track"><div id="energyFill"></div></div></div>
+        <div class="meter"><label>OUT</label><div class="meter-track"><div id="levelFill" class="lvl"></div></div></div>
+      </div>
+    </div>
+
+    <div class="panel readout-panel">
+      <div class="panel-title">SCORE READOUT</div>
+      <div class="readout-grid">
+        <div class="ro"><label>MOVEMENT</label><b id="movRead">—</b></div>
+        <div class="ro"><label>SECTION</label><b id="secRead">—</b></div>
+        <div class="ro"><label>BAR</label><b id="barRead" class="hero-num">0</b></div>
+        <div class="ro"><label>TEMPO</label><b id="tempoRead">—</b></div>
+        <div class="ro wide"><label>KEY</label><b id="keyRead">—</b></div>
+        <div class="ro wide chord"><label>CHORD</label><b id="chordRead">—</b><span id="romanRead"></span></div>
+      </div>
+      <div class="bar-nav">
+        <button id="backBtn" aria-label="back four bars">◀◀ 4</button>
+        <button id="startBtn" aria-label="return to bar zero">bar 0</button>
+        <button id="fwdBtn" aria-label="forward four bars">4 ▶▶</button>
+      </div>
+      <div class="seed-row">
+        <input id="seedIn" aria-label="seed" spellcheck="false" inputmode="numeric">
+        <button id="seedGo" aria-label="apply seed">go</button>
+        <button id="rollBtn" aria-label="roll a new seed">⚄ roll</button>
+        <button id="copyBtn" aria-label="copy link to this moment">⎘ share this bar</button>
+      </div>
+      <div class="fine">
+        the same seed replays the same piece forever — bar 4,000 already exists.
+        share the link and a friend lands in your exact moment.
+      </div>
+    </div>
+
+    <div class="panel notes-panel">
+      <div class="panel-title">PROGRAM NOTES — spoken by the machine</div>
+      <div id="notesLog" class="notes-log" aria-live="polite">
+        <div class="note"><span class="note-bar">—</span><span class="note-text">press play. then listen to what it says about what it just did.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <figure class="scorefield">
+    <canvas id="viz" width="1200" height="440" aria-label="live score visualization"></canvas>
+    <figcaption>the score, flowing past the playhead · compass of recent roots at right · aurora from the room's own spectrum</figcaption>
+  </figure>
+
+  <section class="jam" aria-label="jam with the machine">
+    <div class="panel jam-panel">
+      <div class="panel-title">PLAY WITH IT</div>
+      <p>
+        while it runs, press <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd><kbd>G</kbd><kbd>H</kbd><kbd>J</kbd><kbd>K</kbd><kbd>L</kbd> —
+        you get the scale it is currently living in, in the octave above its melody voice.
+        it will echo your notes through the room and, occasionally, comment on them.
+        space bar pauses. nothing else about the piece changes; it keeps its places for you.
+      </p>
+    </div>
+  </section>
+
+  <section class="about" aria-label="what this is">
+    <div class="panel">
+      <div class="panel-title">WHAT THIS MACHINE IS</div>
+      <div class="about-cols">
+        <div>
+          <h2>the composition</h2>
+          <p>
+            A seeded engine decides everything, deterministically: a chain of related
+            keys and modes, tempos, diatonic progressions drawn from per-mode pools
+            with suspensions and a borrowed minor iv, seventh chords at your discretion
+            of probability. Each 64-bar movement gets a motif — a rhythm cell and a
+            contour in <em>diatonic steps</em>, which is why inversion, retrograde and
+            augmentation can never leave the key. Melodies are harmonized bar by bar:
+            strong beats snap to chord tones, weak beats may pass through. Pads are
+            voiced by brute-force nearest-octave voice leading against the previous
+            chord. Six named sections per movement (Threshold, Ground, Clearing,
+            Drift, Signal, Horizon) shape an energy curve that gates every voice,
+            and the machine writes program notes about what it is doing.
+          </p>
+        </div>
+        <div>
+          <h2>the sound</h2>
+          <p>
+            No audio files exist anywhere in this project. The reverb is a stereo
+            impulse response generated at startup from smoothed noise with pre-delay
+            and early reflections. Detuned saw pads breathe under a shared filter LFO;
+            the bass is sine + envelope-swept saw; plucks are triangle/saw through a
+            falling lowpass; the lead is an FM flute with delayed vibrato and
+            portamento; chimes are two-operator FM with inharmonic ratios; drums are
+            pitch-dive sines and band-passed noise; wind and risers are the same
+            noise, filtered. Everything is scheduled with sample-accurate Web Audio
+            automation, ~7 instruments, ping-pong delay locked to the piece's own tempo.
+          </p>
+        </div>
+      </div>
+      <p class="about-foot">
+        No frameworks. No build step. No network calls after load. The only runtime
+        dependencies are mathematics and the AudioContext.
+        <br>Built in one uninterrupted session by <strong>Qwen 3.8 Flash</strong> for
+        <a href="../">Show Me What You Can Do</a>.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="pagefoot">
+  <a href="../index.html">← back to all the models</a>
+  <span>·</span>
+  <span>bar <b id="footBar">0</b> of forever</span>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+<noscript><p style="padding:2rem;color:#f2b134">This instrument requires JavaScript. It is entirely made of it.</p></noscript>
+</body>
+</html>
