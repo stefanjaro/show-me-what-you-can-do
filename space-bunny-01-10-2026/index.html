@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SPACE BUNNY №1 — four instruments, built from simple rules</title>
+<meta name="description" content="Reaction–diffusion, a neural network written from scratch, a real-time path tracer and a fluid solver. No libraries, no frameworks, no images. Just arithmetic.">
+<meta name="theme-color" content="#05070c">
+<meta property="og:title" content="SPACE BUNNY №1">
+<meta property="og:description" content="Four instruments, built from simple rules.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305070c'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23e8a33d'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23ede8df' stroke-width='1' opacity='.45'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"><i data-progress></i></div>
+
+<header class="masthead">
+  <a class="masthead__mark" href="#top">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <circle cx="12" cy="12" r="3.2" fill="currentColor"/>
+      <circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1" opacity=".4"/>
+      <path d="M12 .8v3.2M12 20v3.2M.8 12h3.2M20 12h3.2" stroke="currentColor" stroke-width="1" opacity=".4"/>
+    </svg>
+    <span>SPACE&nbsp;BUNNY <em>№1</em></span>
+  </a>
+  <nav class="rail" aria-label="Instruments">
+    <a href="#culture" data-rail><i>№1</i><span>The Culture</span></a>
+    <a href="#dreamer" data-rail><i>№2</i><span>The Dreamer</span></a>
+    <a href="#light"   data-rail><i>№3</i><span>The Light</span></a>
+    <a href="#weather" data-rail><i>№4</i><span>The Weather</span></a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ───────────────────────────── HERO ───────────────────────────── -->
+  <section class="hero" data-section data-accent="#e8a33d">
+    <div class="hero__canvas" aria-hidden="true"><canvas data-hero-canvas></canvas></div>
+    <div class="hero__scrim" aria-hidden="true"></div>
+    <div class="hero__body">
+      <p class="kicker reveal">An instrument, not a website</p>
+      <h1 class="hero__title">
+        <span class="reveal" style="--d:.05s">Four instruments,</span>
+        <span class="reveal" style="--d:.13s">built from</span>
+        <span class="reveal" style="--d:.21s"><em>simple rules.</em></span>
+      </h1>
+      <p class="hero__lede reveal" style="--d:.32s">
+        Everything below was written from scratch. No libraries, no frameworks,
+        no images, no build step. Each instrument starts with a handful of
+        numbers, runs a tiny rule over and over, and lets the pattern
+        do the rest.
+      </p>
+      <p class="hero__meta reveal" style="--d:.42s">
+        Written in one session by one language model ·
+        <span data-clock>—</span> · 0 dependencies · 0 images
+      </p>
+      <a class="hero__scroll reveal" style="--d:.55s" href="#culture">
+        <span>scroll to begin</span>
+        <svg viewBox="0 0 12 30" width="12" height="30" aria-hidden="true"><path d="M6 0v26M1 21l5 6 5-6" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── THESIS (scroll) ─────────────────────── -->
+  <section class="thesis" data-section data-accent="#e8a33d">
+    <p class="thesis__line reveal">
+      Beautiful things are not designed.
+      <br>They are the <em>residue</em> of simple rules, given time.
+    </p>
+    <p class="thesis__foot reveal">
+      Turing spotted it in a cow. It runs inside your fingerprints,
+      in the flames of a candle, in a fingertip of frost, in the way
+      this page is currently being assembled.
+    </p>
+  </section>
+
+  <!-- ─────────────────────── №1 THE CULTURE ─────────────────────── -->
+  <section class="instr" id="culture" data-section data-accent="#e8a33d"
+           data-title="The Culture" data-readout="culture">
+    <div class="instr__head">
+      <div class="plate">№1</div>
+      <div>
+        <h2 class="instr__title">The Culture</h2>
+        <p class="instr__sub">two chemicals · no plan · <span class="mono">Turing, 1952</span></p>
+      </div>
+      <button class="srcbtn" data-src-toggle aria-expanded="false">read the source</button>
+    </div>
+
+    <figure class="frame" data-frame>
+      <canvas data-canvas aria-label="Reaction-diffusion simulation. Drag on the canvas to seed new growth."></canvas>
+      <div class="frame__grid" aria-hidden="true"></div>
+      <div class="frame__hud" data-hud aria-live="off"></div>
+      <div class="frame__panel" data-panel>
+        <div class="panel__row">
+          <span class="panel__label">morphology</span>
+          <div class="seg" data-presets>
+            <button data-preset="coral" class="on">coral</button>
+            <button data-preset="mitosis">mitosis</button>
+            <button data-preset="worms">worms</button>
+            <button data-preset="spots">spots</button>
+            <button data-preset="solitons">solitons</button>
+            <button data-preset="chaos">chaos</button>
+          </div>
+        </div>
+        <div class="panel__row">
+          <label class="sl"><span>feed <b data-out="f">0.0545</b></span>
+            <input type="range" data-slider="f" min="0.010" max="0.090" step="0.0005" value="0.0545"></label>
+          <label class="sl"><span>kill <b data-out="k">0.0620</b></span>
+            <input type="range" data-slider="k" min="0.045" max="0.075" step="0.0005" value="0.0620"></label>
+          <label class="sl"><span>tempo <b data-out="speed">14</b> steps/frame</span>
+            <input type="range" data-slider="speed" min="1" max="40" step="1" value="14"></label>
+        </div>
+        <div class="panel__row panel__row--end">
+          <button class="ghost" data-act="reseed">reseed</button>
+          <button class="ghost" data-act="clear">sterilise</button>
+        </div>
+      </div>
+      <p class="frame__hint" data-hint>drag to seed new growth</p>
+    </figure>
+
+    <div class="instr__body">
+      <p class="lede reveal">
+        Two invisible chemicals drift across a grid. <em>A</em> feeds freely;
+        <em>B</em> eats it and multiplies. That is the entire rulebook. And yet
+        strip away the feed and the kill and all that is left is a preference
+        for patterns that should not exist — stripes, spirals, cell walls,
+        the crackle of dried mud, a leopard's shoulder.
+      </p>
+      <p class="body reveal">
+        Turing wrote this down in 1952 to explain a question nobody had
+        answered: why is a cow patched? The answer cost him his final
+        university paper. It also turned out to be the reason no two
+        fingerprints match, the reason giraffes are patchy, and the reason
+        you can grow bacteria in a dish and watch them invent geometry.
+      </p>
+      <div class="eq reveal" aria-label="The Gray-Scott equations">
+        <div>∂A/∂t = <i>D<sub>A</sub></i>∇²A − AB² + <i>F</i>(1−A)</div>
+        <div>∂B/∂t = <i>D<sub>B</sub></i>∇²B + AB² − (<i>F</i>+<i>k</i>)B</div>
+      </div>
+      <p class="body body--dim reveal">
+        Feed rate <span class="mono">F</span> and kill rate <span class="mono">k</span>
+        are the only two knobs. Drag on the plate and you are injecting
+        <span class="mono">B</span> by hand — a tiny act of god.
+      </p>
+      <div class="src" data-src hidden>
+        <div class="src__bar"><span data-src-name>source</span><button data-src-close>close</button></div>
+        <pre class="src__body"><code data-src-code></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── №2 THE DREAMER ─────────────────────── -->
+  <section class="instr instr--wide" id="dreamer" data-section data-accent="#5ee0c8"
+           data-title="The Dreamer" data-readout="dreamer">
+    <div class="instr__head">
+      <div class="plate">№2</div>
+      <div>
+        <h2 class="instr__title">The Dreamer</h2>
+        <p class="instr__sub">a neural network · written by hand · knows nothing</p>
+      </div>
+      <button class="srcbtn" data-src-toggle aria-expanded="false">read the source</button>
+    </div>
+
+    <figure class="frame frame--grid" data-frame>
+      <div class="dream">
+        <div class="dream__cell">
+          <div class="dream__label"><b>target</b><span>what it has to learn</span></div>
+          <canvas data-d="target" class="pad" aria-label="Draw here with your mouse or finger"></canvas>
+          <div class="dream__tools">
+            <button data-d="pen" class="on">brush</button>
+            <button data-d="erase">erase</button>
+            <button data-d="clear">clear</button>
+            <button data-d="surprise">surprise me</button>
+          </div>
+        </div>
+
+        <div class="dream__cell dream__cell--out">
+          <div class="dream__label"><b>its answer</b><span data-d="step">step 0</span></div>
+          <canvas data-d="output" class="pad" aria-hidden="true"></canvas>
+          <div class="dream__err"><span>mean squared error</span><b data-d="loss">—</b></div>
+        </div>
+
+        <div class="dream__cell">
+          <div class="dream__label"><b>loss</b><span data-d="epochs">0 epochs</span></div>
+          <canvas data-d="curve" class="chart" aria-hidden="true"></canvas>
+          <div class="dream__err"><span data-d="netdesc">—</span></div>
+        </div>
+
+        <div class="dream__cell dream__cell--wide">
+          <div class="dream__label"><b>what each neuron decided</b><span>first hidden layer, asked the same question everywhere: <em>how much, here?</em></span></div>
+          <canvas data-d="acts" class="acts" aria-hidden="true"></canvas>
+        </div>
+
+        <div class="dream__cell dream__cell--wide">
+          <div class="dream__label"><b>the weights</b><span>every number it is allowed to change</span></div>
+          <canvas data-d="weights" class="acts acts--w" aria-hidden="true"></canvas>
+        </div>
+      </div>
+
+      <div class="frame__hud frame__hud--br" data-hud></div>
+
+      <div class="frame__panel frame__panel--wide" data-panel>
+        <div class="panel__row">
+          <span class="panel__label">architecture</span>
+          <div class="seg" data-presets>
+            <button data-preset="tiny">2×12</button>
+            <button data-preset="small" class="on">3×24</button>
+            <button data-preset="wide">3×40</button>
+            <button data-preset="deep">4×28</button>
+          </div>
+        </div>
+        <div class="panel__row">
+          <label class="sl"><span>depth <b data-out="depth">3</b></span>
+            <input type="range" data-slider="depth" min="2" max="6" step="1" value="3"></label>
+          <label class="sl"><span>width <b data-out="width">24</b></span>
+            <input type="range" data-slider="width" min="6" max="64" step="2" value="24"></label>
+          <label class="sl"><span>rate <b data-out="lr">0.012</b></span>
+            <input type="range" data-slider="lr" min="0.001" max="0.06" step="0.001" value="0.012"></label>
+        </div>
+        <div class="panel__row">
+          <span class="panel__label">optimiser</span>
+          <div class="seg" data-presets>
+            <button data-preset="adam" class="on">adam</button>
+            <button data-preset="sgd">sgd</button>
+            <button data-preset="momentum">momentum</button>
+          </div>
+          <label class="sl sl--inline"><span>effort <b data-out="thrash">10</b> ms</span>
+            <input type="range" data-slider="thrash" min="1" max="24" step="1" value="10"></label>
+        </div>
+      </div>
+    </figure>
+
+    <div class="instr__body">
+      <p class="lede reveal">
+        Draw anything. A square, your initials, a face — the network has never
+        seen it before and will never see it again. It starts from pure noise
+        every single time, guesses, measures how badly it did, and corrects
+        itself by hand-writing the derivative of its own mistake.
+      </p>
+      <p class="body reveal">
+        There is no framework here. No tensor library, no autodiff engine, no
+        optimiser, no build step. Just three functions —
+        <span class="mono">forward</span>, <span class="mono">backward</span>,
+        <span class="mono">step</span> — and 168 of the 1024 points handed to
+        it at a time, chosen at random. The weights are stored output-major so
+        that every inner loop walks memory in a straight line; switch that
+        round and the arithmetic is identical but 40% slower. The buffers are
+        allocated once and refilled forever, because handing the garbage
+        collector half a megabyte sixty times a second costs more than all the
+        mathematics.
+      </p>
+      <p class="body reveal">
+        The grid is not decoration. It is what the neurons actually compute
+        when asked <em>how much, here, at this x and this y?</em> A hidden unit
+        has no idea what a drawing is — it has never seen one, and it will
+        forget the moment the weights move. Yet within a few hundred steps each
+        one settles on a private opinion about the entire plane: some find
+        edges, some find blobs, and one of them will always, inexplicably,
+        find the diagonal.
+      </p>
+      <div class="eq reveal">
+        <div>ŷ = σ(W<sub>1</sub>σ(W<sub>2</sub>σ(…W<sub>L</sub>·[x, y, sin 3x, cos 3y])))</div>
+        <div class="eq__dim">L = (1/B) Σ (ŷ − y)² &nbsp;·&nbsp; ∂L/∂ŷ = (2/B)(ŷ − y) &nbsp;·&nbsp; ∂L/∂W = xᵀ·∂L/∂ŷ</div>
+      </div>
+      <div class="src" data-src hidden>
+        <div class="src__bar"><span data-src-name>source</span><button data-src-close>close</button></div>
+        <pre class="src__body"><code data-src-code></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── №3 THE LIGHT ─────────────────────── -->
+  <section class="instr" id="light" data-section data-accent="#f2d3a0"
+           data-title="The Light" data-readout="light">
+    <div class="instr__head">
+      <div class="plate">№3</div>
+      <div>
+        <h2 class="instr__title">The Light</h2>
+        <p class="instr__sub">no meshes · no triangles · no textures · only photons</p>
+      </div>
+      <button class="srcbtn" data-src-toggle aria-expanded="false">read the source</button>
+    </div>
+
+    <figure class="frame" data-frame>
+      <canvas data-canvas aria-label="Real-time path traced scene. Drag to orbit, scroll to dolly."></canvas>
+      <div class="frame__hud" data-hud></div>
+      <div class="frame__panel" data-panel>
+        <div class="panel__row">
+          <span class="panel__label">view</span>
+          <div class="seg" data-presets>
+            <button data-preset="box" class="on">the box</button>
+            <button data-preset="glass">glass</button>
+            <button data-preset="mirror">mirror</button>
+            <button data-preset="orbit">orbit</button>
+          </div>
+        </div>
+        <div class="panel__row">
+          <label class="sl"><span>exposure <b data-out="exposure">1.15</b></span>
+            <input type="range" data-slider="exposure" min="0.1" max="4" step="0.01" value="1.15"></label>
+          <label class="sl"><span>roughness <b data-out="rough">0.06</b></span>
+            <input type="range" data-slider="rough" min="0" max="1" step="0.01" value="0.06"></label>
+          <label class="sl"><span>bounces <b data-out="bounces">6</b></span>
+            <input type="range" data-slider="bounces" min="1" max="12" step="1" value="6"></label>
+        </div>
+        <div class="panel__row">
+          <label class="sl"><span>lamp <b data-out="light">30</b></span>
+            <input type="range" data-slider="light" min="2" max="90" step="1" value="30"></label>
+          <label class="sl"><span>glass ior <b data-out="ior">1.52</b></span>
+            <input type="range" data-slider="ior" min="1.01" max="2.4" step="0.01" value="1.52"></label>
+          <label class="sl"><span>aperture <b data-out="aperture">0.02</b></span>
+            <input type="range" data-slider="aperture" min="0" max="0.2" step="0.002" value="0.02"></label>
+        </div>
+      </div>
+      <p class="frame__hint" data-hint>drag to orbit · scroll to dolly</p>
+    </figure>
+
+    <div class="instr__body">
+      <p class="lede reveal">
+        Nothing in this image exists. There is no model, no polygon, no
+        photograph, no light map. A fragment shader fires a photon out of the
+        lamp in a random direction and asks one question over and over:
+        <em>what do you hit?</em> Then it obeys — bouncing off the walls,
+        refracting through the glass, bending toward the polished sphere —
+        and reports home.
+      </p>
+      <p class="body reveal">
+        Then ask it again, and again, and average the answers. The running
+        count is printed in the corner; on an ordinary graphics card it climbs
+        past forty million paths every second, and the flat white floor quietly
+        turns pink where the red wall reflects into it. The shadow under the
+        sphere is soft because nobody told it to be. Every image here arrived
+        by being <em>found</em>.
+      </p>
+      <div class="eq reveal">
+        <div>L(x₀, ω) = L(x<sub>t</sub>, ω<sub>t</sub>) &nbsp;·&nbsp; β(x<sub>t</sub>, −ω<sub>t</sub>, ω)</div>
+        <div class="eq__dim">E[L] = (1/N) Σ L<sub>i</sub>&nbsp;&nbsp;·&nbsp;&nbsp;N &rarr; &infin; &nbsp;&nbsp;·&nbsp;&nbsp;10<sup>7</sup> paths · s<sup>−1</sup></div>
+      </div>
+      <div class="src" data-src hidden>
+        <div class="src__bar"><span data-src-name>source</span><button data-src-close>close</button></div>
+        <pre class="src__body"><code data-src-code></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── №4 THE WEATHER ─────────────────────── -->
+  <section class="instr instr--wide" id="weather" data-section data-accent="#8f7dff"
+           data-title="The Weather" data-readout="weather">
+    <div class="instr__head">
+      <div class="plate">№4</div>
+      <div>
+        <h2 class="instr__title">The Weather</h2>
+        <p class="instr__sub">incompressible · swirling · <span class="mono">Stam, 1999</span></p>
+      </div>
+      <button class="srcbtn" data-src-toggle aria-expanded="false">read the source</button>
+    </div>
+
+    <figure class="frame" data-frame>
+      <canvas data-canvas aria-label="Real-time fluid simulation. Drag to stir the air and lay down dye."></canvas>
+      <div class="frame__hud" data-hud></div>
+      <div class="frame__panel" data-panel>
+        <div class="panel__row">
+          <span class="panel__label">medium</span>
+          <div class="seg" data-presets>
+            <button data-preset="ink" class="on">ink</button>
+            <button data-preset="smoke">smoke</button>
+            <button data-preset="storm">storm</button>
+            <button data-preset="embers">embers</button>
+          </div>
+        </div>
+        <div class="panel__row">
+          <label class="sl"><span>buoyancy <b data-out="buoy">0.9</b></span>
+            <input type="range" data-slider="buoy" min="0" max="3" step="0.01" value="0.9"></label>
+          <label class="sl"><span>swirl <b data-out="vort">1.4</b></span>
+            <input type="range" data-slider="vort" min="0" max="6" step="0.01" value="1.4"></label>
+          <label class="sl"><span>drag <b data-out="dissip">0.22</b></span>
+            <input type="range" data-slider="dissip" min="0" max="1" step="0.01" value="0.22"></label>
+        </div>
+        <div class="panel__row">
+          <label class="sl"><span>brush <b data-out="radius">0.0060</b></span>
+            <input type="range" data-slider="radius" min="0.001" max="0.03" step="0.0005" value="0.006"></label>
+          <button class="ghost" data-act="clear">scrub air</button>
+        </div>
+      </div>
+      <p class="frame__hint" data-hint>drag to stir · release for a gust</p>
+    </figure>
+
+    <div class="instr__body">
+      <p class="lede reveal">
+        A window of air, fifty-eight thousand cells wide, and one rule:
+        never compress. Push it here and it must go there. Every frame each
+        cell asks its neighbours which way the wind is already blowing, works
+        out how far it has been squeezed, and then tries very hard to
+        un-squeeze itself.
+      </p>
+      <p class="body reveal">
+        That's the whole method — twenty-eight sweeps of subtraction, which
+        sounds like nothing at all. And yet by the time the correction is
+        finished there is a front, an eddy behind it, a plume that rolls over
+        on itself and keeps rolling. Stir it with your hand and it will
+        remember your hand for a while, because it is not storing your input.
+        It is storing the consequences.
+      </p>
+      <div class="eq reveal">
+        <div>∂<b>u</b>/∂t = −(<b>u</b>·∇)<b>u</b> − ∇p + ν∇²<b>u</b> + <b>f</b></div>
+        <div>∇·<b>u</b> = 0&nbsp;&nbsp;·&nbsp;&nbsp;p<sub>i</sub> = (Σ p<sub>j</sub> − ∇·<b>u</b>) / 4 &nbsp;&nbsp;·&nbsp;&nbsp;28× per frame</div>
+      </div>
+      <div class="src" data-src hidden>
+        <div class="src__bar"><span data-src-name>source</span><button data-src-close>close</button></div>
+        <pre class="src__body"><code data-src-code></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────── CODA ─────────────────────── -->
+  <section class="coda" data-section data-accent="#e8a33d">
+    <h2 class="coda__title reveal">Everything here is the source.</h2>
+    <div class="coda__grid">
+      <div class="reveal">
+        <p>There are no dependencies. No framework, no bundler, no image
+        files, no web fonts beyond two, no analytics. Open the repository and
+        every line that produced this page is right there — the simulation
+        kernels, the GLSL, the backward pass, the pressure solver.</p>
+      </div>
+      <div class="reveal" style="--d:.08s">
+        <p>The honest summary is that this is all arithmetic, run patiently.
+        A cell of chemical. A gradient. A photon, sampled. A neighbour's
+        velocity. Give any of them enough time and enough copies and something
+        that looks designed walks out of the arithmetic.</p>
+      </div>
+    </div>
+    <ul class="stats reveal">
+      <li><b data-count="0">0</b><span>dependencies</span></li>
+      <li><b data-count="0">0</b><span>images &amp; textures</span></li>
+      <li><b data-count="4106">0</b><span>lines of hand-written code</span></li>
+      <li><b data-count="4">0</b><span>live simulations</span></li>
+      <li><b data-count="60">0</b><span>frames a second</span></li>
+    </ul>
+    <p class="colophon reveal">
+      SPACE BUNNY №1 · built <span data-date>10 January 2026</span> ·
+      typeset in Instrument Serif &amp; IBM Plex Mono ·
+      <a href="#top">return to the top ↑</a>
+    </p>
+  </section>
+
+</main>
+
+<div class="hud" data-global-hud aria-hidden="true"><span data-hudline></span></div>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/hero.js"></script>
+<script src="assets/js/culture.js"></script>
+<script src="assets/js/dreamer.js"></script>
+<script src="assets/js/light.js"></script>
+<script src="assets/js/weather.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
