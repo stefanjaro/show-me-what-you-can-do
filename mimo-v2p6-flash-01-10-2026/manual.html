@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CONTINUUM CA-7 — Operator's Manual</title>
+<meta name="description" content="Block reference, patchboard rules, worked derivations and numerical notes for the CONTINUUM CA-7 virtual analog computer.">
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="css/manual.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f4efe4'/%3E%3Crect x='5' y='5' width='22' height='22' fill='none' stroke='%23b7332a' stroke-width='3'/%3E%3C/svg%3E">
+</head>
+<body>
+<div class="sheet">
+
+<header class="mast">
+  <div class="mast__no">DOC CA7&#8209;OM&#8209;01 · REV A</div>
+  <h1>CONTINUUM <span>CA-7</span></h1>
+  <p class="sub">Operator's Manual · Virtual Analog Computer</p>
+  <div class="rule"></div>
+  <p class="standfirst">This booklet explains the machine behind the panel: what each block does, why
+    every stage inverts, how a set of differential equations becomes a patchboard, and what the
+    solver is doing sixty times a second. Read &sect;3 before you wire anything that bites.</p>
+  <p class="back"><a href="./">&larr; Back to the machine</a></p>
+</header>
+
+<nav class="toc">
+  <a href="#s1">1 · Voltage as a variable</a>
+  <a href="#s2">2 · Block reference</a>
+  <a href="#s3">3 · Rules of the patchboard</a>
+  <a href="#s4">4 · Two worked derivations</a>
+  <a href="#s5">5 · Numerical notes</a>
+  <a href="#s6">6 · The audio monitor</a>
+  <a href="#s7">7 · Operation</a>
+</nav>
+
+<section id="s1">
+  <h2>1 · Voltage as a variable</h2>
+  <p>An analog computer has no idea what a number is. It has voltages, and rules about how voltages
+    may change. If you decide that 1 volt means 1 centimetre of displacement, then a wire carrying
+    3.4 volts <em>is</em> 3.4 centimetres, everywhere on the panel at once, continuously, forever.
+    Addition happens because currents add at a junction. Multiplication happens because a field
+    effect transistor's channel narrows with one voltage and carries another. Integration — the
+    hard one, the one no resistor can do — happens because charge piles up on a capacitor at a rate
+    proportional to the current pushing it.</p>
+
+  <h3>1.1 The inverting summer</h3>
+  <p>Every op-amp block on this panel is built around the same trick. The amplifier's inverting
+    input is a <em>virtual ground</em>: negative feedback drives it to whatever voltage sits on the
+    non-inverting input, which is ground. So the input currents never fight each other — they all
+    pour into a node that isn't moving, and the amplifier must sink exactly that current through
+    its feedback resistor. The output therefore swings to the negative of the weighted sum:</p>
+  <div class="eq">V<sub>out</sub> = &minus;( g<sub>1</sub>V<sub>1</sub> + g<sub>2</sub>V<sub>2</sub> + g<sub>3</sub>V<sub>3</sub> + g<sub>4</sub>V<sub>4</sub> )</div>
+  <p>The minus sign is not a design flaw, it is the whole design. It is what makes the feedback
+    negative instead of a latch. Flip the sign twice and you get back where you started; flip it an
+    odd number of times and every equation you write down needs its signs reversed. Section 3
+    makes this a rule you can follow without thinking.</p>
+
+  <h3>1.2 The integrator</h3>
+  <p>Replace the feedback resistor with a capacitor and the block stops being a summer and starts
+    being calculus. Since i = C&nbsp;dv/dt and the summing junction keeps the input current
+    proportional to the input voltage, the output voltage becomes the running integral:</p>
+  <div class="eq">V<sub>out</sub>(t) = IC &minus; &int;<sub>0</sub><sup>t</sup> ( g<sub>1</sub>V<sub>1</sub> + g<sub>2</sub>V<sub>2</sub> + g<sub>3</sub>V<sub>3</sub> ) d&tau;</div>
+  <p>The IC knob sets the charge already on the capacitor: the value the integral starts from. Press
+    <b>IC RESET</b> and every integrator on the panel snaps back to its initial condition, which is
+    how a real machine starts a computation. It is also the only place on this panel where a number
+    is stored. Nothing else holds anything — take your hands off the knobs and every other block
+    simply reports what its inputs are doing this instant.</p>
+</section>
+
+<section id="s2">
+  <h2>2 · Block reference</h2>
+  <p>Nine patchable blocks and four instrument units. Inputs are blue&#8209;grey jacks, outputs are
+    amber. An input accepts one cord at a time; an output fans out to as many as you like.</p>
+
+  <table>
+    <thead>
+      <tr><th>Block</th><th>Transfer</th><th>Jack detail</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>SUM</b></td>
+        <td class="m">OUT = &minus;(g<sub>1</sub>1 + g<sub>2</sub>2 + g<sub>3</sub>3 + g<sub>4</sub>4)</td>
+        <td>4 inputs, 1 output</td>
+        <td>Adding terms together; reversing a sign; scaling by a coefficient.</td>
+      </tr>
+      <tr>
+        <td><b>INTEGRATOR</b></td>
+        <td class="m">OUT = IC &minus; &int;(g<sub>1</sub>1 + g<sub>2</sub>2 + g<sub>3</sub>3) dt</td>
+        <td>3 inputs, 1 output, IC knob</td>
+        <td>Every state variable. One per order of the differential equation.</td>
+      </tr>
+      <tr>
+        <td><b>MULTIPLIER</b></td>
+        <td class="m">OUT = g &middot; (A &middot; B) / 10</td>
+        <td>2 inputs, 1 output, gain</td>
+        <td>Products: predation, saturation, the nonlinear terms of chaos.</td>
+      </tr>
+      <tr>
+        <td><b>FUNCTION</b></td>
+        <td class="m">OUT = g &middot; f(IN)</td>
+        <td>1 input, 1 output, 5 curves</td>
+        <td>sin for pendulums; x&sup3; and x|x| for springs that misbehave.</td>
+      </tr>
+      <tr>
+        <td><b>GENERATOR</b></td>
+        <td class="m">OUT = A &middot; wave(2&pi;ft)</td>
+        <td>1 output, freq &amp; amp</td>
+        <td>Forcing terms: anything the equations drive from outside.</td>
+      </tr>
+      <tr>
+        <td><b>COMPARATOR</b></td>
+        <td class="m">OUT = &plusmn;10 V, switching at B &plusmn; h</td>
+        <td>2 inputs, 1 output, hysteresis</td>
+        <td>Thresholds, square waves, bang&#8209;bang control, hysteresis.</td>
+      </tr>
+      <tr>
+        <td><b>POT</b></td>
+        <td class="m">OUT = k &middot; IN</td>
+        <td>1 input, 1 output</td>
+        <td>A coefficient from 0 to 1 you can turn while it runs.</td>
+      </tr>
+      <tr>
+        <td><b>CONSTANT</b></td>
+        <td class="m">OUT = V</td>
+        <td>1 output</td>
+        <td>Fixed terms: carrying capacity, initial forcing, an offset.</td>
+      </tr>
+      <tr>
+        <td><b>REFERENCE</b></td>
+        <td class="m">OUT = 0 V, +10 V, &minus;10 V</td>
+        <td>3 outputs</td>
+        <td>The rails themselves, patched in as signals.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="units">
+    <thead>
+      <tr><th>Instrument</th><th>Controls</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>XY DISPLAY</b></td><td>X/Y V&#8202;/&#8202;DIV, X/Y POS</td>
+        <td>Plots one voltage against another &mdash; the phase plane. Green phosphor, 10 &times; 6 graticule.</td></tr>
+      <tr><td><b>TIME BASE</b></td><td>CH1&ndash;3, TIME/DIV</td>
+        <td>Three beams against time, each with its own automatic volts&#8202;/&#8202;division.</td></tr>
+      <tr><td><b>METER</b></td><td>IN</td>
+        <td>A moving&#8209;coil voltmeter, &plusmn;10 V, damped by being a needle.</td></tr>
+      <tr><td><b>AUDIO</b></td><td>IN, LEVEL, VCO / SIGNAL</td>
+        <td>Hears a signal: VCO turns volts into pitch, SIGNAL plays the waveform itself.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s3">
+  <h2>3 · Rules of the patchboard</h2>
+  <ol class="rules">
+    <li><b>Every loop must pass through an integrator.</b> A circle of summers and multipliers
+      defines an algebraic equation with no way to evaluate it; the machine reports
+      <span class="lamp">LOOP</span> and iterates to a best guess. A circle containing an integrator
+      defines a differential equation, which is the only thing this machine is good for.</li>
+    <li><b>Count your inversions.</b> SUM and INTEGRATOR each negate. Two of them in a row cancel;
+      one on its own flips the sign of everything downstream. If your trajectory runs away in the
+      direction you didn't expect, you almost certainly owe the equation a sign.</li>
+    <li><b>Keep everything inside &plusmn;10 V.</b> Op&#8209;amps saturate against their supplies,
+      and so does this one. The <span class="lamp">SAT</span> lamp means a block is pinned to a rail
+      and no longer doing arithmetic &mdash; rescale your variables, or lower a coefficient.</li>
+    <li><b>The multiplier divides by ten.</b> OUT = g&middot;A&middot;B/10 exists so that two
+      10&#8209;volt signals can be multiplied without leaving the rails. The g knob is your output
+      potentiometer; use it to put the product back into the units your equation wants.</li>
+    <li><b>Every state variable gets its own integrator.</b> A second&#8209;order equation needs two,
+      wired head to tail. Three&#8209;dimensional chaos needs three.</li>
+    <li><b>An open input is 0 V.</b> Nothing is connected means the term isn't there &mdash; which is
+      how you turn a coefficient off, and how you leave an unused comparator input at reference.</li>
+    <li><b>Initial conditions are part of the problem.</b> The IC knob is not a preference; it is the
+      value of the state at t = 0. Set it, press IC RESET, and the trajectory begins again from
+      exactly there &mdash; which is how you demonstrate sensitive dependence by starting two runs
+      a hair apart.</li>
+    <li><b>Scale before you wire.</b> Real machines never put a physical quantity on the panel at
+      full magnitude; they solve in machine units and convert afterwards. Section 4 shows the
+      arithmetic on the Lorenz circuit.</li>
+  </ol>
+</section>
+
+<section id="s4">
+  <h2>4 · Two worked derivations</h2>
+
+  <h3>4.1 A mass on a spring</h3>
+  <p>Start from the equation and count what you need. ẍ = &minus;kx is second order, so it wants
+    two integrators: one that turns acceleration into velocity, one that turns velocity into
+    position.</p>
+  <div class="eq">&#x1E8D; = &minus;kx &nbsp;&rArr;&nbsp; v = &int;(&minus;kx) dt &nbsp;&rArr;&nbsp; x = &int;(v) dt</div>
+  <p>Now the signs. An integrator computes OUT = IC &minus; &int;(...), so the expression in the
+    brackets must be the <em>negative</em> of the derivative you want:</p>
+  <table class="wires">
+    <thead><tr><th>Wire</th><th>Gain</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="m">v.OUT &rarr; x.1</td><td class="m">&minus;1</td>
+        <td>x' = v requires the bracket to equal &minus;v.</td></tr>
+      <tr><td class="m">x.OUT &rarr; v.1</td><td class="m">+k</td>
+        <td>v' = &minus;kx requires the bracket to equal +kx.</td></tr>
+    </tbody>
+  </table>
+  <p>One gain is negative, one is positive: the two inversions are what make the pair agree with a
+    single &minus;kx. Turn up the pot in the feedback path and you add a term +c&middot;v to the
+    bracket, which is &minus;c&middot;v to the derivative &mdash; friction, for the price of one
+    patch cord.</p>
+
+  <h3>4.2 The Lorenz circuit, in machine units</h3>
+  <p>The raw equations swing far past the rails, so they are solved in scaled voltages: X = x/4,
+    Y = y/4, Z = z/6. Substituting and collecting gives a system whose coefficients all fit on
+    knobs:</p>
+  <div class="eq">Ẋ = 10(Y &minus; X)<br>Ẏ = 28X &minus; 6XZ &minus; Y<br>Ż = (8/3)(XY &minus; Z)</div>
+  <table class="wires">
+    <thead><tr><th>Wire</th><th>Gain</th><th>Term</th></tr></thead>
+    <tbody>
+      <tr><td class="m">x.1 &rarr; x.1 (self)</td><td class="m">+10</td><td>+10X</td></tr>
+      <tr><td class="m">y.OUT &rarr; x.2</td><td class="m">&minus;10</td><td>&minus;10Y</td></tr>
+      <tr><td class="m">x.OUT &rarr; y.1</td><td class="m">&minus;28</td><td>+28X</td></tr>
+      <tr><td class="m">m<sub>xz</sub>.OUT &rarr; y.2</td><td class="m">+27.27</td>
+        <td>6XZ, since m<sub>xz</sub> = 0.25&middot;XZ</td></tr>
+      <tr><td class="m">y.OUT &rarr; y.3</td><td class="m">+1</td><td>&minus;Y</td></tr>
+      <tr><td class="m">m<sub>xy</sub>.OUT &rarr; z.1</td><td class="m">&minus;12.12</td>
+        <td>8/3 &middot; XY, since m<sub>xy</sub> = 0.25&middot;XY</td></tr>
+      <tr><td class="m">z.OUT &rarr; z.2</td><td class="m">+2.667</td><td>&minus;(8/3)Z</td></tr>
+    </tbody>
+  </table>
+  <p>Five blocks, eleven cords, and the butterfly. Every gain in the right-hand column is a number
+    you can read off the panel while it runs.</p>
+</section>
+
+<section id="s5">
+  <h2>5 · Numerical notes</h2>
+  <p>Of course the machine is digital underneath &mdash; a real op&#8209;amp does not have a clock.
+    What matters is that the clock is fast, the method is honest, and every approximation is one you
+    can find on this page.</p>
+
+  <table class="spec">
+    <tbody>
+      <tr><th>Method</th><td>Explicit trapezoidal (Heun, RK2): predict with a forward Euler step,
+        re&#8209;evaluate the network, then take the average of the two slopes.</td></tr>
+      <tr><th>Timestep</th><td>1/4000 s exactly. Three network evaluations per step (predict,
+        correct, and a final evaluation so the displays read the settled values).</td></tr>
+      <tr><th>Order of evaluation</th><td>Dependencies are topologically sorted. Integrator outputs
+        are state, so they are treated as sources &mdash; which is exactly why every loop needs to
+        pass through one. If a cycle survives that reduction, the algebra has no closed&#8209;form
+        solution: the network is iterated six times to convergence and the
+        <span class="lamp">LOOP</span> lamp comes on.</td></tr>
+      <tr><th>Rails</th><td>Every block output is limited to &plusmn;10 V. The lamp is only lit when
+        a value <em>would</em> have exceeded a rail, so sitting exactly on one (a stock that has
+        reached carrying capacity, say) does not count as a fault.</td></tr>
+      <tr><th>Display sampling</th><td>Every tenth step &mdash; 400 samples per second &mdash; into
+        ring buffers of 8192 samples, i.e. 20.5 seconds of history per watched signal. The screens
+        redraw once per animation frame; the XY tube decays older points into the phosphor, the time
+        base rescales each channel automatically to 1, 2, 5 or 10 V/div.</td></tr>
+      <tr><th>Twin run</th><td>A second copy of the network, same cords, same knobs, initial
+        conditions offset by a fixed epsilon: 0.0004 V for Lorenz, 0.001 V for R&ouml;ssler and the
+        driven pendulum. It costs nothing to run and it is the butterfly effect as a feature.</td></tr>
+      <tr><th>Cost</th><td>About 30 ms of wall time per simulated second &mdash; under half a
+        millisecond per animation frame on an ordinary laptop.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.1 Verification</h3>
+  <p>None of the ready&#8209;patched circuits were trusted on sight. Each one is checked by
+    <code>node test/run.js</code> against an independently written RK4 integration of the equations
+    printed on its panel, together with physical invariants: energy conservation for the spring,
+    the conserved quantity of Lotka&ndash;Volterra, the equilibrium of the fishery at two levels of
+    effort, the population sum and monotone decline of the epidemic, the exact period of the
+    relaxation oscillator, the amplitude of the van der Pol limit cycle, and statistics for the
+    chaotic systems (including how far the twin runs apart, and by when). Seventy&#8209;six
+    assertions, all of them passing. <code>node test/ui.js</code> then drives the real page in
+    headless Chromium: it drags cords in and out, turns knobs, builds and deletes blocks, shares a
+    link and reloads it, exercises the transport and checks a phone&#8209;s width.</p>
+</section>
+
+<section id="s6">
+  <h2>6 · The audio monitor</h2>
+  <p>Sound is just a voltage that changes fast enough to be interesting. The AUDIO unit has two
+    modes and nothing starts until you press <b>ENABLE AUDIO</b>, because browsers require a human
+    gesture before they will open a sound card.</p>
+  <dl class="deflist">
+    <dt>VCO</dt>
+    <dd>Any signal you patch in becomes a pitch:
+      f = 110 Hz &middot; 2<sup>2.5V/10</sup>. Zero volts is 110 Hz, +10 V is 622 Hz,
+      &minus;10 V drops to 19 Hz. The oscillator is a triangle, and its frequency follows the
+      voltage through a 25 ms smoothing filter so it glides instead of stepping. Because the pitch
+      tracks the signal rather than the waveform, a slowly evolving curve &mdash; the fishery
+      collapsing, an epidemic peaking &mdash; reads as a melody you can follow.</dd>
+    <dt>SIGNAL</dt>
+    <dd>The voltage itself, played as audio. The solver hands every 4 kHz sample of the patched
+      signal to an AudioWorklet, which resamples it to the device rate with linear interpolation
+      and holds the last value if the machine is held &mdash; a sample and hold, exactly as it
+      should be. Change <b>SPEED</b> and the pitch changes with it: you are playing the simulation
+      back at a different tape speed.</dd>
+  </dl>
+</section>
+
+<section id="s7">
+  <h2>7 · Operation</h2>
+  <table class="keys">
+    <tbody>
+      <tr><th>Space</th><td>RUN / HOLD</td></tr>
+      <tr><th>R</th><td>reload every initial condition and restart the clock</td></tr>
+      <tr><th>1&ndash;9, 0</th><td>patch preset circuits 1 through 10</td></tr>
+      <tr><th>drag a knob</th><td>change it; hold <b>Shift</b> for fine travel, double&#8209;click to
+        reset, arrow keys when it has focus</td></tr>
+      <tr><th>drag an amber jack</th><td>make a cord; drop it on a blue&#8209;grey jack. Pull a cord
+        off its input and let go to unplug it.</td></tr>
+      <tr><th>COPY LINK</th><td>encode the entire machine &mdash; blocks, cords, knob settings
+        &mdash; into the address bar</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.1 When something looks wrong</h3>
+  <table class="spec">
+    <tbody>
+      <tr><th>Nothing moves</th><td>HOLD is lit? A cord missing from the scope? Are the ICs where
+        you think? Integrators only change when something feeds them.</td></tr>
+      <tr><th><span class="lamp">SAT</span> is lit</th><td>A block is pinned to a rail. Turn a
+        coefficient down, or scale the variables (rule 8 of section 3).</td></tr>
+      <tr><th><span class="lamp">LOOP</span> is lit</th><td>You have wired a loop with no
+        integrator in it. Break it, or put an integrator in it.</td></tr>
+      <tr><th>The screens are blank</th><td>They are inputs, not displays: patch a cord into X and Y
+        for the phase plot, CH1&ndash;3 for the time base.</td></tr>
+      <tr><th>No sound</th><td>Press ENABLE AUDIO once; the browser will only allow that from a real
+          click. Then check that a cord reaches the AUDIO unit's IN jack.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer class="colophon">
+  <div class="stamp">END OF DOCUMENT</div>
+  <p><b>CONTINUUM CA-7</b> &mdash; operator's manual, document CA7&#8209;OM&#8209;01, revision A.
+     Written, illustrated and tested by <b>mimo&#8209;v2.6&#8209;flash</b> for
+     <i>Show Me What You Can Do</i>. Hand&#8209;written HTML, CSS and JavaScript: no frameworks, no
+     libraries, no build step, no image assets. Every circuit verified against an independent RK4
+     integration of the same equations before it shipped.</p>
+  <p class="links">
+    <a href="./">The machine</a>
+    <a href="../">The index</a>
+    <a href="https://github.com/stefanjaro/show-me-what-you-can-do">Repository</a>
+  </p>
+</footer>
+
+</div>
+
+
+
+</body>
+</html>

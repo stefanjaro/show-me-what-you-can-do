@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CONTINUUM CA-7 — a virtual analog computer</title>
+<meta name="description" content="A complete patchable analog computer in the browser: nine blocks, ten-volt rails, real patch cords and a phosphor screen. Solve differential equations by wiring them. No libraries.">
+<meta name="color-scheme" content="dark">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/rig.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23191b1f'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%23ffb454' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23ffb454'/%3E%3C/svg%3E">
+</head>
+<body>
+<a class="skip" href="#notes">Skip to the notes</a>
+
+<header class="masthead">
+  <div class="masthead__main">
+    <p class="eyebrow">Virtual analog computer · model CA-7</p>
+    <h1 class="brand">CONTINUUM <span class="brand__model">CA-7</span></h1>
+    <p class="lede">A complete analog computer in your browser: nine patchable blocks, &plusmn;10&nbsp;V
+      rails, real patch cords, a phosphor screen and a loudspeaker. You solve differential equations
+      the way engineers did before digital &mdash; by wiring the mathematics, then watching a voltage obey it.</p>
+  </div>
+  <ul class="specplate">
+    <li><b>SUPPLY</b><span>&plusmn;10 V, hard limited</span></li>
+    <li><b>INTEGRATION</b><span>trapezoidal, 4 kHz</span></li>
+    <li><b>NONLINEARITY</b><span>multiplier, shaper</span></li>
+    <li><b>SERIAL</b><span>&numero;&nbsp;00026</span></li>
+  </ul>
+</header>
+
+<nav class="chips" id="chips" aria-label="ready-patched circuits"></nav>
+
+<main>
+  <div class="rig-wrap">
+    <div class="rig" id="rig">
+      <div class="rig__inner" id="rigInner">
+        <section class="rack rack--computer" aria-label="patch field">
+          <div class="rack__bar">
+            <span class="rack__name">PATCH FIELD</span>
+            <span class="rack__hint" id="rackHint">drag from an output jack to an input jack</span>
+          </div>
+          <div class="panel" id="panel">
+            <div class="panel__plate" id="panelPlate">
+              <span class="panel__plate-name" id="plateName">&mdash;</span>
+              <span class="panel__plate-eq" id="plateEq"></span>
+            </div>
+            <div class="panel__field" id="mods"></div>
+          </div>
+          <div class="rack__legend">
+            <span>TWO INVERTERS PUT THE SIGN BACK</span>
+            <span>OUTPUTS CLIP AT ±10 V</span>
+            <span>AMBER → BLUE-GREY</span>
+          </div>
+        </section>
+
+        <section class="rack rack--inst" id="rackInst" aria-label="instrumentation"></section>
+
+        <svg class="cables" id="cables" aria-hidden="true"></svg>
+      </div>
+    </div>
+
+    <div class="console" role="toolbar" aria-label="transport">
+      <div class="console__set">
+        <button class="btn btn--run is-on" id="btnRun" aria-pressed="true">
+          <i class="led"></i><span id="runLabel">RUNNING</span>
+        </button>
+        <button class="btn" id="btnReset">IC RESET</button>
+        <button class="btn" id="btnShadow" aria-pressed="false">TWIN <i class="led led--sm"></i></button>
+      </div>
+
+      <div class="console__set console__set--knob">
+        <div class="knob knob--standalone" id="speedKnob"></div>
+        <span class="console__cap">SPEED</span>
+      </div>
+
+      <div class="console__status">
+        <span class="readout" id="roTime">t 0.000 s</span>
+        <span class="readout readout--sig" id="roSig">hover a jack</span>
+        <span class="lamp" id="lampSat" hidden>SAT</span>
+        <span class="lamp" id="lampLoop" hidden>LOOP</span>
+      </div>
+
+      <div class="console__set console__set--right">
+        <button class="btn" id="btnCopy">COPY LINK</button>
+        <button class="btn" id="btnClear">CLEAR CORDS</button>
+        <button class="btn btn--icon" id="btnHelp" title="how to use this machine" aria-label="how to use this machine">?</button>
+      </div>
+    </div>
+
+    <div class="toolbox">
+      <span class="toolbox__label">ADD A BLOCK</span>
+      <div class="toolbox__items" id="toolbox"></div>
+    </div>
+
+    <article class="doc" id="doc">
+      <div class="doc__plate">
+        <p class="doc__eyebrow">Patched circuit</p>
+        <h2 id="docTitle">&mdash;</h2>
+        <div class="doc__eq" id="docEq"></div>
+        <p class="doc__tag" id="docTag"></p>
+      </div>
+      <div class="doc__body">
+        <p id="docAbout"></p>
+        <div class="callout callout--try"><b>TRY</b><p id="docTry"></p></div>
+        <div class="callout callout--watch"><b>WATCH FOR</b><p id="docWatch"></p></div>
+      </div>
+    </article>
+  </div>
+
+  <section class="prose" id="notes">
+    <div class="prose__inner">
+      <h2>What you are looking at</h2>
+      <p>Before transistors got cheap enough to be clever, engineers solved differential equations with
+        <em>hardware</em>. Voltage stood in for position, a second voltage for velocity, an operational
+        amplifier added them, a capacitor integrated them, and a plotter wrote the answer out in ink.
+        These machines steered artillery, flew aircraft and modelled entire economies &mdash; then digital
+        computers got fast, and the whole discipline quietly disappeared.</p>
+      <p>CONTINUUM CA-7 is that machine, rebuilt as a web page. There is no <code>dy/dt = ...</code>
+        anywhere in this site. What there is instead is a network of nine block types joined by cords,
+        each doing exactly one physical thing: invert and sum, integrate, multiply, bend, compare,
+        oscillate. Press RUN and the voltages do the mathematics.</p>
+      <p>Every circuit ready-patched on the panel is a set of ordinary differential equations written
+        in hardware. The three integrators that draw the Lorenz butterfly <em>are</em> the Lorenz
+        equations, not a picture of them &mdash; turn one gain knob and the machine is solving something
+        else, immediately and visibly.</p>
+
+      <h2>The nine blocks</h2>
+      <dl class="blocks">
+        <dt>INTEGRATOR</dt>
+        <dd>The capacitor, and the heart of the machine. Its output is the running integral of whatever
+          you feed it, starting from the voltage on its IC knob. Every feedback loop in a circuit has to
+          pass through one of these &mdash; it is what stops the algebra from going circular.</dd>
+        <dt>SUM</dt>
+        <dd>Adds up to four inputs and flips the sign, each input weighted by its own gain. The sign flip
+          is not a defect: it is what an inverting op-amp does, and it is why hand-built patches need an
+          even number of stages before anything looks the way you expected.</dd>
+        <dt>MULTIPLIER</dt>
+        <dd>Two voltages in, their product out, scaled to stay inside the rails. This single block is why
+          any of the interesting circuits are nonlinear at all &mdash; without it you only ever get
+          springs and radios.</dd>
+        <dt>FUNCTION</dt>
+        <dd>Bends a straight signal into sin, x&sup3;, x|x|, |x| or tanh. With SIN selected it is the
+          difference between a spring, which always comes back, and a pendulum, which can go over the top.</dd>
+        <dt>GENERATOR</dt>
+        <dd>The only block allowed to invent a voltage out of nothing: sine, triangle, square or saw,
+          at any frequency from 50 mHz to 800 Hz.</dd>
+        <dt>COMPARATOR</dt>
+        <dd>Snaps between the rails the moment its input crosses a threshold &mdash; and refuses to snap
+          back until it crosses the other one. Square waves, hysteresis, bang-bang control.</dd>
+        <dt>POT &middot; CONSTANT &middot; REFERENCE</dt>
+        <dd>Coefficients, fixed voltages, and the &plusmn;10&nbsp;V supply rails broken out as jacks you
+          can patch from.</dd>
+      </dl>
+
+      <h2>Build your own</h2>
+      <p>Click a block in the strip under the console and it drops onto the panel; drag it by its
+        nameplate to move it, and drag from any amber output jack to any blue-grey input jack to make a
+        cord. An input takes one cord at a time &mdash; plugging a second one in replaces the first, and
+        pulling a cord off its input and letting go unplugs it. Everything is live: change a gain while
+        the machine runs and it keeps its state, so you watch the trajectory bend rather than restart.</p>
+      <p>When you have built something worth keeping, <strong>COPY LINK</strong> puts the whole machine
+        &mdash; blocks, cords, knob settings, scope settings &mdash; into the address bar. Your last
+        session is also kept locally, so closing the tab does not lose your mess.</p>
+
+      <h2>Under the hood</h2>
+      <p>The solver is explicit trapezoidal (Heun) at a fixed 4&nbsp;kHz, three network evaluations per
+        step, which costs about thirty milliseconds of wall time per simulated second &mdash; well under a millisecond per animation frame.
+        Op-amp outputs are hard-limited to the rails, exactly as real ones are: push a circuit too far and
+        the SAT lamp lights and the trace flattens against the edge. Circuits whose loops contain no
+        integrator have no closed-form ordering, so those are iterated to convergence and the LOOP lamp
+        comes on to tell you.</p>
+      <p>The <strong>TWIN</strong> button starts a second copy of the same equations a fraction of a
+        millivolt away and draws it as a ghost. On the spring it never separates. On Lorenz it takes about
+        ten seconds to stop being the same curve &mdash; that is the butterfly effect running on a
+        patchboard in front of you. The audio unit is a voltage-controlled oscillator: any signal you
+        patch into it becomes a pitch, so you can hear a fishery collapse.</p>
+      <p class="prose__more">Full block reference, derivations and the numerical notes are in the
+        <a href="manual.html">operator's manual &rarr;</a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="colophon">
+  <div class="colophon__inner">
+    <p><b>CONTINUUM CA-7</b> &mdash; built by <b>mimo&#8209;v2.6&#8209;flash</b> for
+      <i>Show Me What You Can Do</i>. Hand-written HTML, CSS and JavaScript: no frameworks, no libraries,
+      no build step, no assets. Every circuit is checked against an independent RK4 integration of the
+      same equations before it ships (76 assertions, <code>node test/run.js</code>).</p>
+    <p class="colophon__links">
+      <a href="manual.html">Operator's manual</a>
+      <a href="../">Back to the index</a>
+      <a href="https://github.com/stefanjaro/show-me-what-you-can-do">Repository</a>
+    </p>
+  </div>
+</footer>
+
+<div class="coach" id="coach" hidden>
+  <div class="coach__card">
+    <button class="coach__close" id="coachClose" aria-label="close">&times;</button>
+    <p class="coach__eyebrow">Three things to know</p>
+    <ol class="coach__steps">
+      <li><b>Drag a cord.</b> Press on an amber output jack and drag to a blue-grey input jack.
+        Pull a cord off and let go to unplug it.</li>
+      <li><b>Twist a knob.</b> Drag up or down (hold Shift for fine adjustment, double-click to
+        reset, arrow keys work when it has focus).</li>
+      <li><b>Read the screen.</b> The top display plots one voltage against another; the one below
+        plots three against time. TWIN starts a second, nearly identical run to compare against.</li>
+    </ol>
+    <button class="btn btn--wide" id="coachGo">START THE MACHINE</button>
+  </div>
+</div>
+
+<noscript>
+  <p style="max-width:40rem;margin:2rem auto;padding:1rem;border:1px solid #444;border-radius:8px">
+    This machine is made of JavaScript. Without it there is nothing to patch.</p>
+</noscript>
+
+<script src="js/core.js"></script>
+<script src="js/modules.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/presets.js"></script>
+<script src="js/scope.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/rig.js"></script>
+<script src="js/site.js"></script>
+
+</body>
+</html>

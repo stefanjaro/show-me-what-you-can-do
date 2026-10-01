@@ -1,0 +1,262 @@
+/* CONTINUUM CA-7 - the instrument: racks, panel, blocks, knobs, jacks, cords */
+
+/* ── geometry ─────────────────────────────────────────────── */
+.rig__inner{display:flex;gap:16px;align-items:stretch;width:1080px}
+.rig__inner.is-column{flex-direction:column;align-items:center;gap:14px;width:auto}
+
+.rack{
+  position:relative;padding:12px;border-radius:7px;border:1px solid #343941;
+  background:
+    radial-gradient(circle at 11px 11px,#565d66 0 3.2px,#1b1e22 3.4px 4.6px,transparent 4.8px),
+    radial-gradient(circle at calc(100% - 11px) 11px,#565d66 0 3.2px,#1b1e22 3.4px 4.6px,transparent 4.8px),
+    radial-gradient(circle at 11px calc(100% - 11px),#565d66 0 3.2px,#1b1e22 3.4px 4.6px,transparent 4.8px),
+    radial-gradient(circle at calc(100% - 11px) calc(100% - 11px),#565d66 0 3.2px,#1b1e22 3.4px 4.6px,transparent 4.8px),
+    linear-gradient(180deg,#23262c 0%,#1a1d21 40%,#15171b 100%);
+  box-shadow:0 18px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.07);
+}
+.rack--computer{width:644px;flex:0 0 auto}
+.rack--inst{
+  width:420px;flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:9px;
+  grid-template-rows:auto auto auto;align-content:space-between;
+}
+.rack__bar{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:0 2px 8px}
+.rack__name{font-size:.62rem;font-weight:700;letter-spacing:.24em;color:#9aa2aa}
+.rack__hint{font-size:.62rem;letter-spacing:.04em;color:#5f666e;font-style:italic}
+
+/* ── the patch panel ──────────────────────────────────────── */
+.panel{
+  position:relative;width:620px;height:584px;border-radius:4px;border:1px solid #0d0f12;
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.016) 0 1px,transparent 1px 3px),
+    linear-gradient(180deg,#1b1e22 0%,#171a1e 55%,#141619 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),inset 0 0 70px rgba(0,0,0,.45);
+  overflow:hidden;
+}
+.panel__plate{
+  position:absolute;top:0;left:0;right:0;height:42px;display:flex;align-items:center;gap:.85rem;
+  padding:0 14px;border-bottom:1px solid rgba(255,255,255,.055);
+  background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);
+}
+.panel__plate-name{
+  font-size:.72rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#d5dade;
+  white-space:nowrap;
+}
+.panel__plate-eq{
+  font-family:var(--mono);font-size:.66rem;color:#868d95;letter-spacing:.02em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;
+}
+.panel__field{position:absolute;top:42px;left:0;right:0;bottom:0}
+
+/* ── blocks ───────────────────────────────────────────────── */
+.mod{
+  position:absolute;padding-bottom:7px;border-radius:6px;border:1px solid #363b43;
+  background:linear-gradient(180deg,#262a31 0%,#1f232a 55%,#1b1f25 100%);
+  box-shadow:0 3px 10px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.07);
+  user-select:none;-webkit-user-select:none;
+}
+.mod.is-dragging{box-shadow:0 16px 34px rgba(0,0,0,.6);z-index:9;cursor:grabbing}
+.mod:hover{z-index:8}
+.rack--inst .mod:hover{z-index:1}
+.mod.is-sel{border-color:rgba(255,180,84,.7)}
+.mod__head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:.35rem;
+  padding:.4rem .5rem .32rem;border-bottom:1px solid #2d323a;cursor:grab;
+}
+.mod__head b{font-size:.6rem;font-weight:700;letter-spacing:.15em;color:#e9edf1;text-transform:uppercase}
+.mod__head i{font-style:normal;font-size:.5rem;letter-spacing:.1em;color:#666d75;text-transform:uppercase;white-space:nowrap}
+.mod__del{
+  background:none;border:0;color:#575e66;font-size:.8rem;line-height:1;cursor:pointer;
+  padding:0 .15rem;opacity:0;transition:opacity .12s;
+}
+.mod:hover .mod__del{opacity:1}
+.mod__del:hover{color:#ff8272}
+.mod__body{display:flex;flex-direction:column;gap:.5rem;padding:.5rem .5rem 0}
+.mod__foot{
+  display:flex;align-items:center;justify-content:space-between;gap:.4rem;
+  margin-top:.5rem;padding:.35rem .5rem 0;border-top:1px solid #2d323a;
+}
+
+.terms{display:flex;gap:.15rem;justify-content:space-around}
+.term{display:flex;flex-direction:column;align-items:center;gap:.22rem;flex:1;min-width:0}
+.term__lbl{font-size:.5rem;font-weight:600;letter-spacing:.1em;color:#6d747c;text-transform:uppercase}
+.term__val{font-family:var(--mono);font-size:.56rem;color:#98a0a8;letter-spacing:-.02em}
+.mod__ctl{display:flex;gap:.55rem;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.ctl{display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.ctl__lbl{font-size:.5rem;font-weight:600;letter-spacing:.1em;color:#6d747c;text-transform:uppercase;white-space:nowrap}
+.ctl__val{font-family:var(--mono);font-size:.6rem;color:var(--amber-soft);min-height:.8rem}
+
+.outmark{display:flex;align-items:center;gap:.4rem}
+.outmark span{font-size:.5rem;font-weight:600;letter-spacing:.12em;color:#6d747c;text-transform:uppercase}
+.outval{font-family:var(--mono);font-size:.68rem;color:var(--amber-soft);letter-spacing:-.02em}
+
+/* ── knobs ────────────────────────────────────────────────── */
+.knob{
+  position:relative;width:32px;height:32px;border-radius:50%;cursor:ns-resize;touch-action:none;
+  flex:0 0 auto;
+}
+.knob::before{
+  content:"";position:absolute;inset:-5px;border-radius:50%;pointer-events:none;
+  background:repeating-conic-gradient(from -136deg,#454b54 0deg 1.3deg,transparent 1.3deg 27.2deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 62%,#000 63%);
+  mask:radial-gradient(circle,transparent 0 62%,#000 63%);
+}
+.knob__cap{
+  position:absolute;inset:0;border-radius:50%;transform:rotate(var(--a,0deg));
+  background:radial-gradient(circle at 34% 26%,#565d67,#2a2e35 58%,#14171b 100%);
+  border:1px solid #0d0f12;
+  box-shadow:0 3px 6px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.22);
+  z-index:1;
+}
+.knob__cap::after{
+  content:"";position:absolute;left:50%;top:2px;width:2px;height:10px;margin-left:-1px;
+  border-radius:1px;background:linear-gradient(180deg,#ffe6c2,#ffb454);
+  box-shadow:0 0 5px rgba(255,180,84,.75);
+}
+.knob--big{width:44px;height:44px}
+.knob--big .knob__cap::after{height:14px;top:3px;width:2.5px;margin-left:-1.25px}
+.knob--standalone{width:34px;height:34px}
+.knob:hover .knob__cap,.knob:focus-visible .knob__cap{box-shadow:0 0 0 2px rgba(255,180,84,.45),0 3px 6px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.22)}
+.knob.is-live .knob__cap{box-shadow:0 0 0 2px rgba(255,180,84,.85),0 0 14px rgba(255,180,84,.35),inset 0 1px 0 rgba(255,255,255,.22)}
+
+.knob-tip{
+  position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);
+  font-family:var(--mono);font-size:.66rem;color:#101216;background:var(--amber);
+  padding:.14rem .4rem;border-radius:3px;pointer-events:none;white-space:nowrap;z-index:40;
+  box-shadow:0 4px 12px rgba(0,0,0,.5);
+}
+
+/* ── jacks ────────────────────────────────────────────────── */
+.jack{
+  position:relative;width:22px;height:22px;padding:0;border-radius:50%;cursor:crosshair;
+  border:2.5px solid var(--blue);touch-action:none;
+  background:radial-gradient(circle at 50% 42%,#2a2f36,#15181c 70%);
+  box-shadow:0 2px 3px rgba(0,0,0,.7),inset 0 0 0 1px rgba(0,0,0,.6);
+}
+.jack::after{
+  content:"";position:absolute;inset:4.5px;border-radius:50%;background:#07080a;
+  box-shadow:inset 0 1px 3px #000,0 1px 0 rgba(255,255,255,.06);
+}
+.jack--out{border-color:var(--amber)}
+.jack--gnd{border-color:#48c774}
+.jack--pos{border-color:#e5473f}
+.jack--neg{border-color:#4d9de0}
+.jack.is-plugged::after{background:#31363d;box-shadow:inset 0 1px 2px rgba(0,0,0,.8)}
+.jack.is-hot{box-shadow:0 0 0 3px rgba(255,180,84,.3),0 0 14px rgba(255,180,84,.55)}
+.jack.is-target{box-shadow:0 0 0 4px rgba(125,255,168,.35),0 0 16px rgba(125,255,168,.5)}
+.jack:focus-visible{box-shadow:0 0 0 3px rgba(255,180,84,.6)}
+
+/* ── mode switches ────────────────────────────────────────── */
+.modes{display:flex;gap:2px;justify-content:center;flex-wrap:wrap}
+.mode{
+  padding:.16rem .32rem;border:1px solid #383d45;border-radius:3px;background:#1a1d22;
+  color:#8d949b;font-size:.5rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  cursor:pointer;line-height:1.2;
+}
+.mode:hover{border-color:#5b626b;color:#dfe4e8}
+.mode[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#17120a}
+
+/* ── instrument units (right-hand rack) ───────────────────── */
+.rack--inst .mod{position:static;grid-column:span 1;padding-bottom:6px}
+.rack--inst .mod--xy,.rack--inst .mod--time{grid-column:span 2}
+.rack--inst .mod__head{cursor:default;padding-top:.34rem}
+.rack--inst .mod__del{display:none}
+
+.screen{
+  position:relative;margin:7px 8px 4px;border-radius:5px;overflow:hidden;background:#04060a;
+  border:1px solid #05070a;
+  box-shadow:inset 0 0 34px rgba(0,0,0,.95),0 0 0 1px #2b3037,0 2px 6px rgba(0,0,0,.5);
+}
+.screen canvas{display:block;width:100%;height:auto}
+.screen::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(152deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,0) 38%),
+    radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.5) 100%);
+}
+.rack--inst .knob{width:28px;height:28px}
+.rack--inst .knob::before{inset:-4px}
+.rack--inst .knob--big{width:38px;height:38px}
+.rack--inst .ctl__lbl{font-size:.45rem;letter-spacing:.06em}
+.rack--inst .ctl__val{font-size:.55rem}
+.rack--inst .mod__ctl{gap:.42rem}
+.rack--inst .terms{gap:.5rem}
+.rack--inst .term__sig{font-size:.5rem}
+.unit__row{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;padding:.35rem .7rem .1rem}
+.unit__jacks{display:flex;gap:.55rem;align-items:center}
+.unit__jack{display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.unit__jack span{font-size:.48rem;font-weight:600;letter-spacing:.1em;color:#6d747c;text-transform:uppercase}
+.unit__knobs{display:flex;gap:.45rem;align-items:flex-start}
+.unit__knobs .ctl__val{text-align:center}
+.unit__src{
+  font-family:var(--mono);font-size:.56rem;color:#7c838b;max-width:56%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.unit__note{padding:.15rem .7rem 0;font-size:.52rem;letter-spacing:.06em;color:#5f666e;text-transform:uppercase}
+
+/* meter */
+.mod--meter .meterface{display:block;margin:6px auto 2px;width:calc(100% - 14px);height:auto}
+.mod--meter .rack--inst .knob{width:28px;height:28px}
+.rack--inst .knob::before{inset:-4px}
+.rack--inst .knob--big{width:38px;height:38px}
+.rack--inst .ctl__lbl{font-size:.45rem;letter-spacing:.06em}
+.rack--inst .ctl__val{font-size:.55rem}
+.rack--inst .mod__ctl{gap:.42rem}
+.rack--inst .terms{gap:.5rem}
+.rack--inst .term__sig{font-size:.5rem}
+.unit__row{padding-top:0;justify-content:center;gap:.9rem}
+
+/* audio */
+.mod--audio .mod__body{gap:.4rem}
+.audio__modes{display:flex;gap:3px;justify-content:center;padding-top:.1rem}
+.audio__wave{font-family:var(--mono);font-size:.55rem;color:#7c838b;text-align:center;padding-bottom:.2rem}
+.mod--audio.is-live{border-color:rgba(255,180,84,.55);box-shadow:0 0 22px rgba(255,180,84,.16),0 3px 10px rgba(0,0,0,.45)}
+
+/* ── cords ────────────────────────────────────────────────── */
+.cables{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6;overflow:visible}
+.cables .cord{
+  fill:none;stroke-width:4.6;stroke-linecap:round;
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));
+}
+.cables .cord-gloss{fill:none;stroke-width:1.4;stroke-linecap:round;opacity:.45;stroke:rgba(255,255,255,.75)}
+.cables .cord-hit{fill:none;stroke:transparent;stroke-width:13;pointer-events:stroke;cursor:grab}
+.cables .cord.is-drag .cord-hit{cursor:grabbing}
+.cables .plug{stroke:#0a0b0d;stroke-width:1.4}
+.cables .ghost{opacity:.95}
+
+/* empty-state hint on the panel */
+.panel__hint{
+  position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:#454b53;
+  text-align:center;pointer-events:none;line-height:2;
+}
+.panel__hint[hidden]{display:none}
+
+/* ── responsive: scale the whole instrument down ─────────── */
+.rack__legend{
+  display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  margin-top:8px;padding:6px 4px 1px;border-top:1px solid rgba(255,255,255,.05);
+  font-size:.5rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#5d646c;white-space:nowrap;
+}
+
+/* unit faces keep their jacks and knobs on one line */
+.rack--inst .mod__body{flex-direction:row;align-items:center;justify-content:space-between;gap:.6rem;padding:.45rem .7rem 0}
+.rack--inst .terms{flex:0 0 auto;gap:.55rem}
+.rack--inst .mod__ctl{flex:1;justify-content:flex-end;gap:.5rem;padding-top:0}
+.rack--inst .mod__foot{border-top:0}
+.mod--meter .meterface{width:122px;height:auto;margin:3px auto 0;display:block}
+.mod--meter .mod__body{justify-content:center}
+.audio__note{font-size:.5rem;letter-spacing:.06em;color:#5f666e;text-align:center;padding-bottom:.15rem;text-transform:uppercase}
+.btn--audio{
+  width:100%;justify-content:center;padding:.42rem .5rem;font-size:.6rem;letter-spacing:.12em;
+  background:linear-gradient(180deg,#22262c,#181b1f);
+}
+.btn--audio.is-on{border-color:#3f7d55;color:#d9ffe6}
+.term__sig{font-family:var(--mono);font-size:.53rem;color:#7f868e;letter-spacing:-.04em;min-height:.78rem;white-space:nowrap;overflow:hidden;text-align:center;width:100%}
+.cables.is-live,.cables.is-live *{pointer-events:none !important}
+.mod__head{touch-action:none}
+.knob,.jack,.mode,.tool,.chip{touch-action:none}
+
+@media (max-width:640px){
+  .rack__hint{display:none}
+}
+
