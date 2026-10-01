@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f1eee5">
+  <meta name="description" content="A private, generative atlas for the places you carry. Turn a memory into an original topographic map, made entirely in your browser.">
+  <meta property="og:title" content="The Elsewhere Atlas">
+  <meta property="og:description" content="Somewhere is still here. Make a map of a place you remember.">
+  <meta property="og:type" content="website">
+  <title>The Elsewhere Atlas — somewhere is still here</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='24' fill='%232a443c'/%3E%3Cpath d='M24 7 28 20 41 24 28 28 24 41 20 28 7 24 20 20z' fill='%23e7bd7e'/%3E%3Ccircle cx='24' cy='24' r='3' fill='%23f1eee5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the atlas</a>
+
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="wordmark" href="./" aria-label="The Elsewhere Atlas, home">
+        <svg class="wordmark-mark" viewBox="0 0 48 48" aria-hidden="true">
+          <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="1" />
+          <path d="M24 5 29 20 44 24 29 28 24 43 19 28 4 24 19 20z" fill="currentColor" />
+          <circle cx="24" cy="24" r="3" fill="var(--paper)" />
+        </svg>
+        <span class="wordmark-text">The Elsewhere Atlas<span>A private geography engine</span></span>
+      </a>
+      <div class="topbar-right">
+        <span class="browser-note"><span class="status-dot" aria-hidden="true"></span> MADE IN THIS BROWSER</span>
+        <a class="topbar-link" href="#field-notes">Read the field notes <span aria-hidden="true">↘</span></a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-index">FIELD OFFICE&nbsp; / &nbsp;01</span><span class="eyebrow-divider" aria-hidden="true"></span>A CARTOGRAPHY OF REMEMBERING</p>
+          <h1 id="hero-title"><span>Somewhere</span><span>is still <em>here.</em></span></h1>
+          <p class="hero-deck">A place can outlive its street name. Give this little atlas a memory, and it will make a landscape from the shape of your words.</p>
+        </div>
+        <div class="hero-stamp" aria-hidden="true">
+          <svg viewBox="0 0 200 200">
+            <circle class="stamp-ring" cx="100" cy="100" r="86" />
+            <circle class="stamp-ring stamp-ring-inner" cx="100" cy="100" r="71" />
+            <path class="stamp-star" d="M100 38 112 87 161 100 112 113 100 162 88 113 39 100 88 87z" />
+            <circle class="stamp-center" cx="100" cy="100" r="7" />
+            <path class="stamp-tick" d="M100 7v9m0 168v9M7 100h9m168 0h9" />
+          </svg>
+          <span>NO FIXED<br>COORDINATES</span>
+        </div>
+        <a class="hero-scroll" href="#instrument"><span class="scroll-line" aria-hidden="true"></span>SCROLL TO BEGIN</a>
+      </section>
+
+      <section class="instrument" id="instrument" aria-label="Memory mapmaking studio">
+        <aside class="memory-column" aria-labelledby="memory-heading">
+          <div class="section-kicker"><span>01</span><span class="kicker-rule" aria-hidden="true"></span><span>THE MEMORY</span></div>
+          <h2 class="memory-heading" id="memory-heading">Start with<br>somewhere.</h2>
+          <p class="memory-intro">Not its address. The version you can still feel.</p>
+
+          <form id="memory-form" class="memory-form">
+            <label for="memory-input">A place you carry with you</label>
+            <div class="textarea-wrap">
+              <textarea id="memory-input" name="memory" maxlength="180" rows="4" spellcheck="true" aria-describedby="memory-hint character-count">The cedar porch where rain sounded like someone arriving.</textarea>
+              <span class="textarea-corner" aria-hidden="true">✳</span>
+            </div>
+            <div class="input-footnote">
+              <span id="memory-hint">A sentence is plenty.</span>
+              <span id="character-count" aria-live="off">0 / 180</span>
+            </div>
+            <button class="primary-button" type="submit">
+              <span>Make this a landscape</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" /></svg>
+            </button>
+          </form>
+
+          <div class="memory-prompts" aria-labelledby="prompt-heading">
+            <p class="micro-label" id="prompt-heading">IF YOU NEED A FIRST LINE</p>
+            <button class="prompt-chip" type="button" data-memory="The library stairs after the last bell."><span aria-hidden="true">↗</span>The library stairs after the last bell</button>
+            <button class="prompt-chip" type="button" data-memory="An open window on the first hot night of June."><span aria-hidden="true">↗</span>An open window in June</button>
+            <button class="prompt-chip" type="button" data-memory="The long way home, when nobody was waiting."><span aria-hidden="true">↗</span>The long way home</button>
+          </div>
+
+          <div class="privacy-note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
+            <p><strong>Yours, and yours alone.</strong><br>This page makes the map on your device. Nothing is uploaded. A share link includes the words you choose to put in it.</p>
+          </div>
+
+          <div class="light-control">
+            <div class="light-heading">
+              <label for="light-dial"><span class="micro-label">02 &nbsp; / &nbsp; LIGHT ON THIS WORLD</span><output id="light-output" for="light-dial">BLUE HOUR</output></label>
+              <span class="sun-mark" aria-hidden="true">◒</span>
+            </div>
+            <input id="light-dial" type="range" min="0" max="100" value="55" aria-label="Choose the light on your map">
+            <div class="range-captions" aria-hidden="true"><span>FIRST LIGHT</span><span>BLUE HOUR</span><span>AFTER DARK</span></div>
+          </div>
+        </aside>
+
+        <div class="map-column">
+          <div class="map-heading">
+            <div class="chart-title-group">
+              <p class="chart-number"><span class="status-dot" aria-hidden="true"></span> PERSONAL FIELD STUDY <span class="chart-number-divider">/</span> <span id="chart-serial">NO. 0001</span></p>
+              <h2 id="chart-title">The cedar porch</h2>
+            </div>
+            <button class="text-button share-button" id="share-button" type="button" title="Copy a link that recreates this chart">
+              <span>Share this chart</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12 16 7m-8 5 8 5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/></svg>
+            </button>
+          </div>
+
+          <div class="layer-toolbar" role="group" aria-label="Map layers">
+            <span class="layer-toolbar-label">LAYERS</span>
+            <button class="layer-toggle is-on" type="button" data-layer="relief" aria-pressed="true"><span class="layer-symbol relief-symbol" aria-hidden="true"></span>RELIEF</button>
+            <button class="layer-toggle is-on" type="button" data-layer="water" aria-pressed="true"><span class="layer-symbol water-symbol" aria-hidden="true"></span>WATER</button>
+            <button class="layer-toggle is-on" type="button" data-layer="route" aria-pressed="true"><span class="layer-symbol route-symbol" aria-hidden="true"></span>WANDER</button>
+            <button class="layer-toggle is-on" type="button" data-layer="names" aria-pressed="true"><span class="layer-symbol names-symbol" aria-hidden="true"></span>PLACE NAMES</button>
+          </div>
+
+          <figure class="map-figure" aria-labelledby="chart-title map-caption">
+            <div class="map-stage" id="map-stage">
+              <canvas id="map-canvas" width="1200" height="820" role="img" aria-label="A procedurally generated map, ready to explore. Click the map to place a pin.">Your browser does not support the map canvas. The memory and chart controls remain available.</canvas>
+              <canvas id="effect-canvas" width="1200" height="820" aria-hidden="true"></canvas>
+            </div>
+            <figcaption class="map-caption" id="map-caption">
+              <div class="caption-primary">
+                <span class="micro-label">DRAWN FROM YOUR WORDS</span>
+                <p id="caption-memory">The cedar porch where rain sounded like someone arriving.</p>
+              </div>
+              <div class="caption-secondary">
+                <span class="micro-label" id="grid-caption">FIELD GRID &nbsp;·&nbsp; 12 / 06</span>
+                <span class="map-key"><i class="key-contour" aria-hidden="true"></i> CONTOUR <i class="key-river" aria-hidden="true"></i> WATER <i class="key-route" aria-hidden="true"></i> WANDERING</span>
+              </div>
+            </figcaption>
+          </figure>
+
+          <div class="map-actions">
+            <button class="text-button pin-button" id="pin-center-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg><span>Pin the centre</span></button>
+            <span class="action-divider" aria-hidden="true"></span>
+            <button class="text-button download-button" id="download-button" type="button"><span>Save as PNG</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></svg></button>
+            <span class="pin-instruction">or click the map to mark your own spot</span>
+          </div>
+          <label class="share-fallback" id="share-fallback" hidden>CHART LINK<input id="share-url" type="url" readonly></label>
+          <p class="sr-only" id="action-status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="field-notes" id="field-notes" aria-labelledby="field-notes-title">
+        <div class="field-notes-heading">
+          <p class="eyebrow"><span class="eyebrow-index">FIELD NOTES&nbsp; / &nbsp;01</span><span class="eyebrow-divider" aria-hidden="true"></span>HOW TO READ THIS PLACE</p>
+          <h2 id="field-notes-title">Not a map <i>of</i> memory.<br>A map made <i>from</i> it.</h2>
+        </div>
+        <div class="field-notes-copy">
+          <p class="notes-intro">This atlas cannot know what your memory means. It doesn't have to. Your words become a seed; a little world grows around it.</p>
+          <ol class="notes-list">
+            <li><span class="notes-number">01</span><div><h3>Words become terrain</h3><p>A repeatable, private seed draws every ridge and hollow. The same line always returns you to the same country.</p></div></li>
+            <li><span class="notes-number">02</span><div><h3>Water finds its own way</h3><p>A river crosses the chart, while a dotted path takes the beautifully inefficient route.</p></div></li>
+            <li><span class="notes-number">03</span><div><h3>You are allowed to be here</h3><p>Click a spot on the map. The little red pin does not explain the place. It just belongs to you.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="closing-note" aria-label="A note from the mapmaker">
+        <span class="closing-glyph" aria-hidden="true">✳</span>
+        <p>Somewhere, someone else remembers a place that never existed on any map either.</p>
+        <a href="#instrument">Make another <span aria-hidden="true">↗</span></a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="footer-brand" href="#main">THE ELSEWHERE ATLAS</a>
+      <span>A small machine for the places we carry.</span>
+      <a href="#main">BACK TO THE TOP ↑</a>
+    </footer>
+  </div>
+</body>
+</html>
