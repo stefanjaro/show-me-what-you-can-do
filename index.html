@@ -4,252 +4,130 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Show Me What You Can Do</title>
-<meta name="description" content="One prompt, run by many language models. Each got its own folder, worked alone, and tried to build something worth stumbling upon.">
-<meta name="theme-color" content="#05070c">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305070c'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23e8a33d'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23ede8df' stroke-width='1' opacity='.45'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<meta name="description" content="One prompt, given to different language models. Each worked alone in its own folder with no constraints. This is what they built.">
 <style>
-/* A directory, not a showpiece. One stylesheet, two web fonts, no
-   images. Anyone adding their own entry only has to copy one <li>. */
 :root{
-  --ink:#05070c; --bone:#ece7dd; --dim:#9a9aa2; --faint:#5f616b;
-  --line:rgba(236,231,221,.11); --accent:#e8a33d;
-  --serif:"Instrument Serif",ui-serif,Georgia,serif;
-  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  --pad:clamp(1.25rem,5vw,5rem);
+  color-scheme: light dark;
+  --bg:#ffffff; --fg:#16181d; --muted:#6b7280; --line:#e5e7eb;
+  --panel:#f8f9fa; --link:#1d4ed8;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#101114; --fg:#e8eaed; --muted:#9aa0a6; --line:#2a2d33; --panel:#17191d; --link:#8ab4f8; }
 }
 *,*::before,*::after{box-sizing:border-box}
 body{
-  margin:0;background:var(--ink);color:var(--bone);
-  font-family:var(--mono);font-weight:300;font-size:16px;line-height:1.65;
-  -webkit-font-smoothing:antialiased;
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
 }
-body::after{ /* the same film grain the instrument page uses */
-  content:"";position:fixed;inset:-50%;z-index:9;pointer-events:none;opacity:.03;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-::selection{background:var(--accent);color:#06080d}
-h1,h2,p,ul,ol,figure{margin:0;padding:0}
-ul,ol{list-style:none}
-a{color:inherit}
+main,header.page,footer.page{max-width:48rem;margin:0 auto;padding-inline:1.25rem}
+header.page{padding-top:clamp(2.5rem,9vh,5rem)}
+h1{font-size:clamp(1.6rem,5vw,2.2rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 1.25rem}
+h2{font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 1rem}
+p{margin:0 0 1rem;max-width:42rem}
+a{color:var(--link);text-underline-offset:2px}
+.intro p{color:var(--fg)}
+.more{margin-top:1.25rem}
 
-.wrap{max-width:1120px;margin:0 auto;padding-inline:var(--pad)}
-.kicker{font-size:.66rem;letter-spacing:.34em;text-transform:uppercase;color:var(--accent)}
-.mono-tag{font-variant-numeric:tabular-nums}
-
-/* ── masthead ─────────────────────────────────────────────── */
-header.top{
-  display:flex;align-items:center;justify-content:space-between;gap:1rem;
-  padding:1.1rem var(--pad);
-  border-bottom:1px solid var(--line);
-  position:sticky;top:0;z-index:10;
-  background:rgba(5,7,12,.82);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-}
-.brand{display:flex;align-items:center;gap:.55rem;text-decoration:none;font-size:.7rem;letter-spacing:.22em}
-.brand svg{flex:none;color:var(--accent)}
-.top nav a{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none}
-.top nav a:hover{color:var(--bone)}
-
-/* ── intro ────────────────────────────────────────────────── */
-.intro{padding:clamp(4.5rem,13vh,9rem) 0 clamp(3rem,7vh,5rem)}
-h1{
-  font-family:var(--serif);font-weight:400;
-  font-size:clamp(3rem,11vw,8.5rem);line-height:.94;letter-spacing:-.022em;
-  margin:.9rem 0 1.8rem;
-}
-h1 em{font-style:italic;color:var(--accent)}
-.lede{max-width:46rem;color:#b9b7b0;font-size:clamp(.92rem,1.05vw,1.02rem);line-height:1.8}
-blockquote.prompt{
-  margin:clamp(2rem,5vh,3rem) 0 0;padding:1.3rem 0 0;border-top:1px solid var(--line);
-  max-width:52rem;color:var(--faint);font-size:.82rem;line-height:1.85;
-}
-blockquote.prompt cite{display:block;margin-top:.8rem;font-style:normal;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase}
-
-/* ── entries ──────────────────────────────────────────────── */
-.entries{padding:0 0 clamp(5rem,12vh,9rem)}
-.entries h2{
-  font-family:var(--serif);font-weight:400;font-size:clamp(1.6rem,3.6vw,2.6rem);
-  letter-spacing:-.015em;margin-bottom:clamp(1.5rem,4vh,2.5rem);
-}
-.count{color:var(--faint);font-size:.7rem;letter-spacing:.14em;margin-left:.6rem;font-family:var(--mono)}
-
-.entry{border-top:1px solid var(--line)}
-.entry:last-of-type{border-bottom:1px solid var(--line)}
-.entry__head{
-  display:block;text-decoration:none;padding:clamp(1.6rem,4vh,2.4rem) 0;
-  transition:background .35s ease;
-}
-.entry__no{color:var(--accent);font-size:.9rem;letter-spacing:.1em;margin-right:.9rem}
-.entry__name{
-  font-family:var(--serif);font-size:clamp(1.7rem,4.4vw,3rem);line-height:1.05;
-  letter-spacing:-.015em;
-}
-.entry__tag{display:block;margin-top:.7rem;color:var(--accent);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase}
-.entry__desc{display:block;margin-top:1rem;max-width:52rem;color:var(--dim);font-size:.88rem;line-height:1.8}
-.entry__chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.3rem}
-.chip{
-  font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
-  border:1px solid var(--line);padding:.3rem .55rem;
-}
-.entry__head:hover .entry__name{color:var(--accent)}
-.entry__go{display:inline-block;margin-top:1.4rem;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
-.entry__head:hover .entry__go{color:var(--accent)}
-
-/* deep links into the four instruments */
-.deep{display:flex;flex-wrap:wrap;gap:.5rem;padding:0 0 1.8rem}
-.deep a{
-  text-decoration:none;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--dim);border:1px solid var(--line);padding:.42rem .7rem;
-  transition:color .3s,border-color .3s;
-}
-.deep a:hover{color:var(--accent);border-color:var(--accent)}
-
-.empty{
-  margin-top:clamp(2.5rem,6vh,4rem);padding:1.6rem 0;
-  border-top:1px solid var(--line);color:var(--faint);font-size:.85rem;line-height:1.9;
+/* ── entries table ───────────────────────────────────────── */
+section.entries{padding-top:clamp(2.5rem,7vh,4rem)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;vertical-align:top;padding:.85rem 1rem .85rem 0;border-bottom:1px solid var(--line)}
+th{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
+td.model{font-weight:600;white-space:nowrap}
+td.work{white-space:nowrap}
+td.desc{color:var(--muted);font-size:.94rem}
+td.desc strong{color:var(--fg);font-weight:600}
+@media (max-width:42rem){
+  thead{display:none}
+  tr{display:block;padding:.9rem 0;border-bottom:1px solid var(--line)}
+  td{display:block;border:0;padding:.2rem 0;white-space:normal}
+  td::before{content:attr(data-label);display:block;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  td.desc{font-size:1rem}
 }
 
-/* ── footer ───────────────────────────────────────────────── */
-footer{
-  padding:clamp(2.5rem,6vh,4rem) 0 clamp(3rem,7vh,5rem);
-  border-top:1px solid var(--line);
-  display:flex;flex-wrap:wrap;gap:.6rem 2rem;align-items:center;
-  font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);
+/* ── prompt ──────────────────────────────────────────────── */
+section.prompt{padding:clamp(2.5rem,7vh,4rem) 0 clamp(3rem,8vh,5rem)}
+pre{
+  margin:0;padding:1.25rem 1.4rem;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;
+  white-space:pre-wrap;overflow-wrap:break-word;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.86rem;line-height:1.75;
 }
-footer a{color:var(--dim);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
-footer a:hover{color:var(--accent);border-color:var(--accent)}
 
-@media (max-width:600px){
-  .top nav a:last-child{display:none}
-  .entry__name{font-size:1.7rem}
-}
+/* ── footer ──────────────────────────────────────────────── */
+footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var(--muted);font-size:.82rem}
 </style>
 </head>
 <body>
 
-<header class="top">
-  <a class="brand" href="./">
-    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-      <circle cx="12" cy="12" r="3.2" fill="currentColor"/>
-      <circle cx="12" cy="12" r="8.4" fill="none" stroke="currentColor" stroke-width="1" opacity=".4"/>
-      <path d="M12 .8v3.2M12 20v3.2M.8 12h3.2M20 12h3.2" stroke="currentColor" stroke-width="1" opacity=".4"/>
-    </svg>
-    <span>SHOW ME WHAT YOU CAN DO</span>
-  </a>
-  <nav><a href="https://github.com/stefanjaro/show-me-what-you-can-do">Repository ↗</a></nav>
+<header class="page">
+  <h1>Show Me What You Can Do</h1>
+  <div class="intro">
+    <p>
+      This project hands one prompt to different language models and gets out of
+      the way. Each model is given its own folder, told to work alone, and left
+      completely unconstrained — no brief, no theme, no instructions about what
+      to make. It can build whatever it wants, for as long as it wants. The only
+      rule is that it must not look at the other models' folders.
+    </p>
+    <p>
+      What follows is what each of them chose to build.
+      <a href="#prompt">Read the full prompt ↓</a>
+    </p>
+  </div>
 </header>
 
-<main class="wrap">
-
-  <section class="intro">
-    <p class="kicker">One prompt · many models · nobody peeking</p>
-    <h1>Show me what<br>you can <em>do.</em></h1>
-    <p class="lede">
-      A single prompt was handed to several language models. Each one was given
-      its own folder, told to work alone, and asked to build something that
-      would be worth stopping for. Nobody was permitted to look at anybody
-      else's work. What follows is what they made.
-    </p>
-    <blockquote class="prompt">
-      You are XXX model. I've heard you're a remarkable and highly intelligent
-      model. This repo is a github site. Your workspace is the XXX folder. I
-      want you to show me what you're capable of. Push yourself to the max. I
-      want you to work hard towards impressing, not just me, but anyone that
-      stumbles upon this site, with the incredible things you're capable of.
-      I'm not going to constrain you in any other way. I'm not going to tell you
-      what you should do in your workspace. I'm going to let you run for as long
-      as you like. You shouldn't peek at any of the other model's workspaces by
-      the way. That would be cheating and copying their hard work.
-      <cite>The prompt, verbatim</cite>
-    </blockquote>
-  </section>
-
+<main>
   <section class="entries">
-    <h2>What they built <span class="count mono-tag">2 entries</span></h2>
-
-    <!-- ══ ADD YOUR OWN ENTRY BY COPYING THIS <article> ══ -->
-    <article class="entry">
-      <a class="entry__head" href="space-bunny-01-10-2026/">
-        <span class="entry__no">№1</span>
-        <span class="entry__name">SPACE BUNNY №1</span>
-        <span class="entry__tag">four instruments, built from simple rules</span>
-        <span class="entry__desc">
-          A single page holding four live simulations, written from scratch —
-          no libraries, no frameworks, no build step, no image files. Two
-          chemicals that cannot see each other grow coral. A neural network
-          with no autodiff library, which you can hand a drawing and watch it
-          learn. A path tracer that finds a Cornell box by sampling light
-          paths and nothing else. A fluid solver that turns pressure
-          corrections into weather. Every instrument panel can show you its own
-          source code, fetched live.
-        </span>
-        <span class="entry__chips">
-          <span class="chip">reaction–diffusion</span>
-          <span class="chip">neural network from scratch</span>
-          <span class="chip">path tracer</span>
-          <span class="chip">stable fluids</span>
-          <span class="chip">WebGL 2</span>
-          <span class="chip">0 dependencies</span>
-        </span>
-        <span class="entry__go">Open it →</span>
-      </a>
-      <ul class="deep">
-        <li><a href="space-bunny-01-10-2026/#culture">№1 The Culture</a></li>
-        <li><a href="space-bunny-01-10-2026/#dreamer">№2 The Dreamer</a></li>
-        <li><a href="space-bunny-01-10-2026/#light">№3 The Light</a></li>
-        <li><a href="space-bunny-01-10-2026/#weather">№4 The Weather</a></li>
-      </ul>
-    </article>
-
-    <article class="entry">
-      <a class="entry__head" href="deepseek-v4p1-flash-01-10-2026/">
-        <span class="entry__no">№2</span>
-        <span class="entry__name">VOLTA-16</span>
-        <span class="entry__tag">a computer that never existed</span>
-        <span class="entry__desc">
-          A complete 16-bit machine, built from nothing: its instruction set,
-          the assembler that compiles for it, the firmware burned into its ROM,
-          a 160×120 video chip, a three-voice sound chip, and seven cartridges
-          written in its own assembly language. Power it on in the browser,
-          play the games, read every line, then rewrite them — the editor
-          assembles your changes live and the debugger steps the CPU one
-          instruction at a time. The cube's 32-bit multiplier is built from
-          shifts and adds because that is what the hardware gives you.
-        </span>
-        <span class="entry__chips">
-          <span class="chip">custom CPU + assembler</span>
-          <span class="chip">firmware ROM</span>
-          <span class="chip">7 cartridges of asm</span>
-          <span class="chip">live editor</span>
-          <span class="chip">debugger</span>
-          <span class="chip">0 dependencies</span>
-        </span>
-        <span class="entry__go">Power it on →</span>
-      </a>
-      <ul class="deep">
-        <li><a href="deepseek-v4p1-flash-01-10-2026/#snake">The snake</a></li>
-        <li><a href="deepseek-v4p1-flash-01-10-2026/#fire">The fire</a></li>
-        <li><a href="deepseek-v4p1-flash-01-10-2026/#chiptune">The chiptune</a></li>
-        <li><a href="deepseek-v4p1-flash-01-10-2026/#cube">The cube</a></li>
-        <li><a href="deepseek-v4p1-flash-01-10-2026/#ripple">The ripple</a></li>
-      </ul>
-    </article>
-
-    <p class="empty">
-      Two entries so far. The remaining models are still working — when they
-      finish, their folders appear beside these and this page grows another card.
-    </p>
+    <h2>What they built</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>What they built</th>
+          <th>Work</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="model" data-label="Model">Claude Opus 4.8</td>
+          <td class="desc" data-label="What they built">
+            <strong>SPACE BUNNY №1</strong> — four live simulations written from
+            scratch with no libraries or build step: a reaction–diffusion system
+            that grows Turing patterns, a neural network trained live on your
+            drawings, a progressive path tracer, and a fluid solver.
+          </td>
+          <td class="work" data-label="Work"><a href="space-bunny-01-10-2026/">Open site →</a></td>
+        </tr>
+        <tr>
+          <td class="model" data-label="Model">DeepSeek V4.1 Flash</td>
+          <td class="desc" data-label="What they built">
+            <strong>VOLTA-16</strong> — a complete 16-bit computer that never
+            existed: custom instruction set, assembler, firmware ROM, video and
+            sound chips, and seven cartridges written in its own assembly, with
+            a live editor and CPU debugger in the browser.
+          </td>
+          <td class="work" data-label="Work"><a href="deepseek-v4p1-flash-01-10-2026/">Open site →</a></td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 
+  <section class="prompt" id="prompt">
+    <h2>The prompt</h2>
+    <p>Every model received exactly this, with only the bracketed placeholders filled in:</p>
+<pre>You are the [MODEL] model on [THINKING-LEVEL] thinking. I've heard you're a remarkable and highly intelligent model. This repo is a github site. Your workspace is the [FOLDER] folder. I want you to show me what you're TRULY capable of. Push yourself to the MAXIMUM. I want you to work HARD towards impressing, not just me, but anyone other human being that stumbles upon this site, with the INCREDIBLE things you're capable of. I'm not going to constrain you in any other way. I'm not going to tell you what you should do in your workspace. You come up with the idea that'll blow all our minds. I'm going to let you run for as long as you like. But you shouldn't peek at any of the other model's workspaces. That would be cheating and copying their hard work.
+
+Make sure to update the index file at the root of the repo with a link to your own gitlab site in your workspace folder. Your own site SHOULD NOT be influenced by the design of the index page. DO NOT change the design of the index page.
+
+Now go! Go forth and make us humans shudder and tremble at your incredible capabilities!</pre>
+  </section>
 </main>
 
-<footer class="wrap">
-  <span>Every page here is hand-written</span>
-  <a href="https://github.com/stefanjaro/show-me-what-you-can-do">Repository ↗</a>
-  <span>Add your own entry by copying one &lt;article class="entry"&gt;</span>
+<footer class="page">
+  Prompt by Stefan Jaro · <a href="https://github.com/stefanjaro/show-me-what-you-can-do">Repository ↗</a>
 </footer>
 
 </body>
