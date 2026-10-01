@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>PRIMORDIA — A Living World in Your Browser</title>
+<meta name="description" content="PRIMORDIA is a living planet simulated from scratch in your browser: procedural terrain, evolving neural creatures, god tools, a DNA lab, and deep time. No libraries, no assets.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="stage">
+  <canvas id="world"></canvas>
+  <div id="vignette"></div>
+  <canvas id="grain" width="128" height="128" style="display:none"></canvas>
+</div>
+
+<header id="topbar">
+  <div class="brand"><span class="orb"></span><b>PRIMORDIA</b><small>living&nbsp;world&nbsp;engine</small></div>
+  <div id="worldName">Unnamed World<em>seed —</em></div>
+  <div id="clock">YR 0 · SPRING · DAY 1</div>
+  <nav class="topbtns">
+    <button class="tbtn primary" id="btnGenesis" title="Generate a brand-new world">✦ Genesis</button>
+    <button class="tbtn" id="btnSave" title="Save world to this browser">Save</button>
+    <button class="tbtn" id="btnShare" title="Copy a link with this world's seed">Share</button>
+    <button class="tbtn icon" id="btnSound" title="Toggle generative soundscape">🔈</button>
+    <button class="tbtn icon" id="btnHelp" title="What is this? How does it work?">?</button>
+    <button class="tbtn icon" id="btnPanel" title="Toggle side panel">☰</button>
+  </nav>
+</header>
+
+<div id="followChip"></div>
+
+<aside id="toolbar" aria-label="God tools">
+  <div class="thead">God tools</div>
+  <button class="tool active" data-tool="inspect" data-tip="Inspect / select life  (V)"><span class="g">◉</span><span class="key">V</span></button>
+  <button class="tool" data-tool="raise" data-tip="Raise land  (R)"><span class="g">▲</span><span class="key">R</span></button>
+  <button class="tool" data-tool="lower" data-tip="Carve ocean  (E)"><span class="g">▼</span><span class="key">E</span></button>
+  <button class="tool" data-tool="forest" data-tip="Seed forest  (F)"><span class="g">🌲</span><span class="key">F</span></button>
+  <button class="tool" data-tool="herbivore" data-tip="Release grazers  (H)"><span class="g">🦌</span><span class="key">H</span></button>
+  <button class="tool" data-tool="predator" data-tip="Release hunters  (C)"><span class="g">🐺</span><span class="key">C</span></button>
+  <button class="tool" data-tool="rain" data-tip="Summon rain  (N)"><span class="g">🌧</span><span class="key">N</span></button>
+  <button class="tool danger" data-tool="fire" data-tip="Wildfire  (X)"><span class="g">🔥</span><span class="key">X</span></button>
+  <button class="tool danger" data-tool="meteor" data-tip="Meteor strike  (M)"><span class="g">☄</span><span class="key">M</span></button>
+  <button class="tool danger" data-tool="plague" data-tip="Plague  (P)"><span class="g">☠</span><span class="key">P</span></button>
+  <button class="tool" data-tool="iceage" data-tip="Trigger / end ice age  (I)"><span class="g">❄</span><span class="key">I</span></button>
+  <div id="brushRow"><label>Brush</label><input id="brush" type="range" min="1" max="9" value="4"></div>
+</aside>
+
+<aside id="panel">
+  <div class="tabs">
+    <button class="tab active" data-tab="census">Life</button>
+    <button class="tab" data-tab="dna">DNA Lab</button>
+    <button class="tab" data-tab="history">History</button>
+    <button class="tab" data-tab="planet">Planet</button>
+  </div>
+
+  <section class="tabbody active" id="tab-census">
+    <div class="statgrid">
+      <div class="stat"><b class="mint" id="stPop">0</b><span>creatures</span></div>
+      <div class="stat"><b class="lime" id="stPlant" style="color:var(--lime)">0</b><span>plant mass</span></div>
+      <div class="stat"><b class="peri" id="stSpec">0</b><span>species alive</span></div>
+      <div class="stat"><b class="amber" id="stExt">0</b><span>extinct</span></div>
+    </div>
+    <div class="chartLabel"><span>Population · live</span><i id="popScale"></i></div>
+    <canvas id="popChart" width="600" height="172"></canvas>
+    <h4 class="sec">Species census</h4>
+    <div id="speciesList"></div>
+    <h4 class="sec">Ecosystem</h4>
+    <div class="kv"><span>Mean temperature</span><b id="kvTemp">—</b></div>
+    <div class="kv"><span>Rainfall</span><b id="kvRain">—</b></div>
+    <div class="kv"><span>Forested land</span><b id="kvForest">—</b></div>
+    <div class="kv"><span>Ocean cover</span><b id="kvOcean">—</b></div>
+    <div class="btnrow">
+      <button class="btn go" id="btnReseed">✦ Reseed life</button>
+      <button class="btn" id="btnShot">📷 Screenshot</button>
+    </div>
+  </section>
+
+  <section class="tabbody" id="tab-dna">
+    <div id="focusCard">
+      <div id="focusHead">
+        <canvas id="focusPortrait" width="104" height="104"></canvas>
+        <div><b id="focusName">No creature selected</b><span id="focusSub">click any creature ◉</span></div>
+      </div>
+      <div id="brainViz" title="Live brain activity"></div>
+    </div>
+    <div id="focusStats"></div>
+    <h4 class="sec">Genome editor</h4>
+    <div id="geneSliders"></div>
+    <div class="btnrow">
+      <button class="btn go" id="btnApplyGenes">🧬 Apply &amp; clone</button>
+      <button class="btn" id="btnFollow">Follow</button>
+      <button class="btn warn" id="btnKill">Kill</button>
+    </div>
+    <p class="help" style="margin-top:10px">Every creature carries a <b>mutable genome</b> plus a tiny <b>evolvable neural brain</b> (6 senses → 8 neurons → 3 drives). Edit genes, clone a new lineage, and watch natural selection grade your design.</p>
+  </section>
+
+  <section class="tabbody" id="tab-history">
+    <div class="statgrid">
+      <div class="stat"><b class="amber" id="stYear">0</b><span>years elapsed</span></div>
+      <div class="stat"><b class="rose" id="stEvents">0</b><span>recorded events</span></div>
+    </div>
+    <div class="chartLabel"><span>Biodiversity · live</span><i>speciation vs extinction</i></div>
+    <canvas id="histChart" width="600" height="172"></canvas>
+    <h4 class="sec">Chronicle of the world</h4>
+    <div id="eventLog"></div>
+  </section>
+
+  <section class="tabbody" id="tab-planet">
+    <h4 class="sec" style="margin-top:0">Climate control</h4>
+    <div class="sliderRow"><div class="lab"><span>☀ Global warmth</span><output id="oWarm">+0.0°</output></div>
+      <input class="gene" id="sWarm" type="range" min="-8" max="8" step="0.5" value="0"></div>
+    <div class="sliderRow"><div class="lab"><span>🌧 Rainfall</span><output id="oRain">100%</output></div>
+      <input class="gene" id="sRain" type="range" min="0" max="250" step="5" value="100"></div>
+    <div class="sliderRow"><div class="lab"><span>🌊 Sea level</span><output id="oSea">0m</output></div>
+      <input class="gene" id="sSea" type="range" min="-14" max="14" step="1" value="0"></div>
+    <div class="sliderRow"><div class="lab"><span>🌍 Seasons</span><output id="oTilt">normal</output></div>
+      <input class="gene" id="sTilt" type="range" min="0" max="200" step="10" value="100"></div>
+    <div class="btnrow">
+      <button class="btn amberb" id="btnMeteor">☄ Meteor</button>
+      <button class="btn amberb" id="btnVolcano">🌋 Volcano</button>
+      <button class="btn" id="btnIce">❄ Ice age</button>
+    </div>
+    <h4 class="sec">World</h4>
+    <div class="kv"><span>Terrain seed</span><b id="kvSeed">—</b></div>
+    <div class="kv"><span>World age</span><b id="kvAge">—</b></div>
+    <div class="kv"><span>Physics</span><b>60 ticks/s</b></div>
+    <div class="btnrow">
+      <button class="btn" id="btnExport">⇩ Export DNA</button>
+      <button class="btn" id="btnNew">✦ New world</button>
+    </div>
+    <p class="help" style="margin-top:10px">Built <b>from scratch</b> — terrain, climate, genetics, neuroevolution, renderer and soundscape are all hand-written. No libraries. No images. No servers. Just math.</p>
+  </section>
+</aside>
+
+<footer id="transport">
+  <button class="tport play" id="btnPlay" title="Pause / resume (Space)">⏸</button>
+  <button class="tport" id="btnStep" title="Step one day">⭢</button>
+  <button class="spd" data-s="1">1×</button>
+  <button class="spd active" data-s="4">4×</button>
+  <button class="spd" data-s="12">12×</button>
+  <button class="spd" data-s="40">40×</button>
+  <canvas id="miniPop" width="260" height="60"></canvas>
+  <span id="hint">drag to pan · wheel to zoom · click life to inspect</span>
+</footer>
+
+<div id="toasts"></div>
+<div id="credit">PRIMORDIA · by Muse Spark · 0 libs · ∞ life</div>
+
+<div id="intro">
+  <div class="introCard">
+    <div class="eyebrow">A living world engine · zero libraries</div>
+    <h1>PRIMORDIA</h1>
+    <p class="sub">In the beginning there is only dust and mathematics. Then continents rise, rain falls, and the first green cell divides. <b>You are the climate, the asteroid, and the laboratory.</b> Creatures with evolvable neural brains will live, adapt, diverge into new species — or vanish into the fossil record. Every world is unique. Every extinction is forever.</p>
+    <div class="presets">
+      <button class="preset sel" data-p="paradise"><span class="art">🌿</span><b>Lush Paradise</b><span>continents · rich soil</span></button>
+      <button class="preset" data-p="archipelago"><span class="art">🏝</span><b>Shattered Isles</b><span>archipelago · isolation</span></button>
+      <button class="preset" data-p="pangaea"><span class="art">🏔</span><b>Harsh Pangaea</b><span>supercontinent · extremes</span></button>
+    </div>
+    <div class="seedrow">
+      <input id="seedInput" spellcheck="false" placeholder="seed…">
+      <button class="tbtn" id="btnDice" title="Random seed">🎲 random</button>
+    </div>
+    <button id="awaken">✦ &nbsp;AWAKEN WORLD&nbsp; ✦</button>
+    <div class="feats"><span>procedural planet</span><span>neuroevolution</span><span>speciation &amp; fossils</span><span>god tools</span><span>generative music</span></div>
+  </div>
+</div>
+
+<div id="modal"><div class="modalCard" id="modalCard"></div></div>
+
+<script src="utils.js"></script>
+<script src="names.js"></script>
+<script src="world.js"></script>
+<script src="life.js"></script>
+<script src="render.js"></script>
+<script src="audio.js"></script>
+<script src="ui.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
