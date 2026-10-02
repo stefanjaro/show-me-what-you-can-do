@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUMEN — Real-Time Path Tracer</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <h1 class="title">LUMEN</h1>
+        <p class="subtitle">Real-Time Path Tracer</p>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat">
+          <span class="stat-label">Samples</span>
+          <span class="stat-value" id="stat-samples">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Rays</span>
+          <span class="stat-value" id="stat-rays">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Time</span>
+          <span class="stat-value" id="stat-time">0.0s</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Resolution</span>
+          <span class="stat-value" id="stat-res">0×0</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="canvas-container">
+        <canvas id="render-canvas"></canvas>
+        <div class="canvas-overlay" id="canvas-overlay">
+          <div class="loading-spinner"></div>
+          <p>Initializing renderer...</p>
+        </div>
+        <div class="canvas-hint" id="canvas-hint">
+          <span>Drag to orbit · Scroll to zoom · Right-drag to pan</span>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="control-group">
+          <h3 class="control-title">Scene</h3>
+          <div class="scene-buttons" id="scene-buttons">
+            <button class="scene-btn active" data-scene="observatory">Observatory</button>
+            <button class="scene-btn" data-scene="glassGarden">Glass Garden</button>
+            <button class="scene-btn" data-scene="metalForge">Metal Forge</button>
+            <button class="scene-btn" data-scene="abstract">Abstract</button>
+            <button class="scene-btn" data-scene="caustics">Caustics</button>
+            <button class="scene-btn" data-scene="mirrorRoom">Mirror Room</button>
+            <button class="scene-btn" data-scene="neonCity">Neon City</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3 class="control-title">Render</h3>
+          <div class="control-row">
+            <label for="samples">Samples / Pixel</label>
+            <input type="range" id="samples" min="1" max="100" value="4">
+            <span class="control-value" id="samples-value">4</span>
+          </div>
+          <div class="control-row">
+            <label for="max-depth">Max Bounces</label>
+            <input type="range" id="max-depth" min="1" max="16" value="8">
+            <span class="control-value" id="max-depth-value">8</span>
+          </div>
+          <div class="control-row">
+            <label for="resolution">Resolution</label>
+            <select id="resolution">
+              <option value="400x300">400 × 300</option>
+              <option value="640x480" selected>640 × 480</option>
+              <option value="800x600">800 × 600</option>
+              <option value="1024x768">1024 × 768</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3 class="control-title">Camera</h3>
+          <div class="control-row">
+            <label for="fov">Field of View</label>
+            <input type="range" id="fov" min="20" max="120" value="60">
+            <span class="control-value" id="fov-value">60°</span>
+          </div>
+          <div class="control-row">
+            <label for="aperture">Aperture</label>
+            <input type="range" id="aperture" min="0" max="50" value="0">
+            <span class="control-value" id="aperture-value">f/∞</span>
+          </div>
+          <div class="control-row">
+            <label for="focal-dist">Focal Distance</label>
+            <input type="range" id="focal-dist" min="1" max="20" value="5">
+            <span class="control-value" id="focal-dist-value">5.0</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3 class="control-title">Post-Processing</h3>
+          <div class="control-row">
+            <label for="bloom">Bloom</label>
+            <input type="checkbox" id="bloom">
+          </div>
+          <div class="control-row">
+            <label for="vignette">Vignette</label>
+            <input type="checkbox" id="vignette">
+          </div>
+          <div class="control-row">
+            <label for="chromatic">Chromatic Aberration</label>
+            <input type="checkbox" id="chromatic">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3 class="control-title">Actions</h3>
+          <div class="action-buttons">
+            <button class="action-btn" id="btn-re-render">Re-Render</button>
+            <button class="action-btn" id="btn-export">Export PNG</button>
+            <button class="action-btn" id="btn-reset">Reset</button>
+            <button class="action-btn" id="btn-progressive">Progressive</button>
+            <button class="action-btn" id="btn-animate">Animate</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <h3 class="control-title">Presets</h3>
+          <div class="preset-buttons">
+            <button class="preset-btn" data-preset="front">Front</button>
+            <button class="preset-btn" data-preset="side">Side</button>
+            <button class="preset-btn" data-preset="top">Top</button>
+            <button class="preset-btn" data-preset="close">Close-up</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <p>LUMEN — A real-time path tracer built with pure JavaScript and Web Workers. No libraries, no assets, just math.</p>
+    </footer>
+  </div>
+
+  <script src="js/vec3.js"></script>
+  <script src="js/material.js"></script>
+  <script src="js/hittable.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/scenes.js"></script>
+  <script src="js/sceneBuilder.js"></script>
+  <script src="js/textures.js"></script>
+  <script src="js/postProcessor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
