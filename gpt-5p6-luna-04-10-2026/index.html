@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0e0f">
+  <meta name="description" content="Liminal Field is a browser-native instrument that turns a sentence into a living visual weather system.">
+  <title>Liminal Field / a machine for the feeling between words</title>
+  <style>
+    :root {
+      --void: #0b0d0e;
+      --ink: #f1eee5;
+      --paper: #d9d7cd;
+      --muted: #8e918d;
+      --faint: #5c625f;
+      --line: rgba(230, 231, 221, .15);
+      --line-strong: rgba(230, 231, 221, .28);
+      --panel: #121617;
+      --panel-raised: #171c1d;
+      --acid: #d9ff55;
+      --coral: #ff806c;
+      --violet: #9a91ff;
+      --cyan: #70d8d1;
+      --display: Georgia, "Times New Roman", serif;
+      --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--void);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 86% 2%, rgba(95, 104, 74, .14), transparent 28rem),
+        radial-gradient(circle at 4% 34%, rgba(78, 71, 111, .12), transparent 35rem),
+        var(--void);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 72px 72px;
+      content: "";
+      mask-image: linear-gradient(to bottom, black, transparent 76%);
+    }
+
+    ::selection { background: var(--acid); color: var(--void); }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .site-shell { width: min(1440px, calc(100% - 64px)); margin: 0 auto; }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 88px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); font-weight: 700; letter-spacing: .16em; }
+    .brand-mark { position: relative; display: grid; width: 24px; height: 24px; place-items: center; border: 1px solid var(--acid); border-radius: 50%; color: var(--acid); font-family: var(--mono); font-size: 9px; letter-spacing: 0; }
+    .brand-mark::after { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--coral); content: ""; transform: translate(7px, -7px); }
+    .header-center { display: flex; align-items: center; gap: 12px; }
+    .status-dot, .live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--acid); box-shadow: 0 0 12px var(--acid); }
+    .header-status { display: flex; align-items: center; gap: 8px; }
+    .site-nav { display: flex; gap: 28px; }
+    .site-nav a { transition: color .2s ease; }
+    .site-nav a:hover, .site-nav a:focus-visible { color: var(--acid); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr);
+      align-items: center;
+      gap: clamp(48px, 9vw, 150px);
+      min-height: min(790px, calc(100vh - 88px));
+      padding: 76px 0 106px;
+    }
+
+    .eyebrow { display: flex; align-items: center; gap: 13px; margin: 0 0 25px; color: var(--acid); font-family: var(--mono); font-size: 10px; letter-spacing: .16em; line-height: 1; text-transform: uppercase; }
+    .eyebrow span { color: var(--faint); }
+    .hero h1 { max-width: 760px; margin: 0; font-size: clamp(4.3rem, 8.5vw, 8.8rem); font-weight: 400; letter-spacing: -.085em; line-height: .89; }
+    .hero h1 i { display: block; color: var(--paper); font-family: var(--display); font-size: .94em; font-style: italic; font-weight: 400; letter-spacing: -.1em; }
+    .hero-lede { max-width: 480px; margin: 35px 0 0; color: var(--paper); font-size: 17px; line-height: 1.7; }
+    .hero-lede strong { color: var(--acid); font-weight: 500; }
+    .hero-actions { display: flex; align-items: center; gap: 23px; margin-top: 40px; }
+    .hero-note { color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      min-height: 47px;
+      padding: 0 20px;
+      border: 1px solid var(--line-strong);
+      background: transparent;
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+      transition: border-color .2s ease, background .2s ease, color .2s ease, transform .2s ease;
+    }
+    .button:hover, .button:focus-visible { border-color: var(--acid); color: var(--acid); transform: translateY(-2px); }
+    .button.primary { border-color: var(--acid); background: var(--acid); color: var(--void); }
+    .button.primary:hover, .button.primary:focus-visible { background: #e6ff82; color: var(--void); }
+    .button span { font-size: 17px; font-weight: 400; line-height: 0; }
+
+    .hero-stats { display: flex; gap: 42px; margin: 74px 0 0; }
+    .hero-stat { display: flex; flex-direction: column; gap: 1px; }
+    .hero-stat strong { color: var(--ink); font-family: var(--display); font-size: 25px; font-weight: 400; letter-spacing: -.04em; }
+    .hero-stat span { color: var(--faint); font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+
+    .hero-art { position: relative; min-height: 520px; overflow: hidden; border: 1px solid var(--line); background: #111516; }
+    .hero-art::before { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 49.9%, rgba(217,255,85,.09) 50%, transparent 50.1%), linear-gradient(transparent 49.9%, rgba(217,255,85,.09) 50%, transparent 50.1%); background-size: 100% 100%, 100% 100%; content: ""; }
+    .hero-art::after { position: absolute; inset: 0; background: radial-gradient(circle at 50% 48%, transparent 0 25%, rgba(11,13,14,.25) 61%, rgba(11,13,14,.7) 100%); content: ""; pointer-events: none; }
+    .hero-orbit { position: absolute; top: 50%; left: 50%; width: min(33vw, 430px); aspect-ratio: 1; border: 1px solid rgba(217,255,85,.34); border-radius: 50%; transform: translate(-50%, -50%) rotate(-17deg); animation: turn 24s linear infinite; }
+    .hero-orbit::before, .hero-orbit::after { position: absolute; inset: 9%; border: 1px solid rgba(154,145,255,.34); border-radius: 50%; content: ""; }
+    .hero-orbit::after { inset: 24%; border-color: rgba(255,128,108,.37); transform: rotate(69deg) scaleX(.7); }
+    .hero-orbit-inner { position: absolute; inset: 35%; border: 1px solid rgba(112,216,209,.6); border-radius: 50%; box-shadow: 0 0 70px rgba(112,216,209,.2), inset 0 0 40px rgba(112,216,209,.16); }
+    .hero-orbit-inner::before { position: absolute; inset: 35%; border-radius: 50%; background: var(--acid); box-shadow: 0 0 30px 9px rgba(217,255,85,.34), 0 0 110px 20px rgba(154,145,255,.15); content: ""; }
+    .hero-orbit-inner::after { position: absolute; top: 50%; left: -29%; width: 158%; height: 1px; background: rgba(217,255,85,.22); content: ""; transform: rotate(-29deg); }
+    .hero-node { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 20px 4px rgba(255,128,108,.45); }
+    .hero-node.a { top: 17%; left: 24%; animation: float-a 7s ease-in-out infinite; }
+    .hero-node.b { right: 18%; bottom: 27%; background: var(--violet); box-shadow: 0 0 20px 4px rgba(154,145,255,.45); animation: float-b 9s ease-in-out infinite; }
+    .hero-art-label { position: absolute; z-index: 1; font-family: var(--mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+    .hero-art-label.top { top: 19px; left: 19px; color: var(--muted); }
+    .hero-art-label.bottom { right: 19px; bottom: 18px; color: var(--acid); }
+    .hero-art-coordinates { position: absolute; right: 19px; top: 19px; color: var(--faint); font-family: var(--mono); font-size: 9px; letter-spacing: .12em; writing-mode: vertical-rl; }
+
+    .intro-line { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; padding: 30px 0 34px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .intro-line p { max-width: 640px; margin: 0; color: var(--paper); font-family: var(--display); font-size: clamp(1.35rem, 2.4vw, 2.2rem); letter-spacing: -.04em; line-height: 1.13; }
+    .intro-line span { color: var(--coral); }
+
+    .field-section { padding: 145px 0 130px; }
+    .section-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .7fr); gap: 30px; align-items: end; margin-bottom: 47px; }
+    .section-heading h2 { max-width: 690px; margin: 0; font-size: clamp(3.2rem, 6.5vw, 6.5rem); font-weight: 400; letter-spacing: -.08em; line-height: .9; }
+    .section-heading h2 em { color: var(--acid); font-family: var(--display); font-style: italic; }
+    .section-description { max-width: 360px; margin: 0 0 5px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+
+    .studio { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, .55fr); border: 1px solid var(--line); background: var(--panel); }
+    .stage-panel { min-width: 0; padding: 13px; }
+    .stage { position: relative; min-height: 650px; overflow: hidden; border: 1px solid var(--line); background: #0d1112; }
+    .stage::before { position: absolute; z-index: 1; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(217,255,85,.08) 1px, transparent 1px), linear-gradient(rgba(217,255,85,.08) 1px, transparent 1px); background-size: 20% 20%; opacity: .28; content: ""; mask-image: linear-gradient(to bottom, black, transparent 75%); }
+    .stage::after { position: absolute; z-index: 1; inset: 0; pointer-events: none; background: radial-gradient(circle at center, transparent 30%, rgba(9,12,13,.08) 65%, rgba(9,12,13,.65) 100%); content: ""; }
+    #fieldCanvas { display: block; width: 100%; height: 100%; min-height: 650px; }
+    .stage-chrome { position: absolute; z-index: 2; right: 18px; left: 18px; display: flex; align-items: center; justify-content: space-between; pointer-events: none; font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+    .stage-chrome.top { top: 18px; color: var(--muted); }
+    .stage-chrome.top span { display: inline-flex; align-items: center; gap: 8px; }
+    .stage-chrome.top strong { color: var(--acid); font-weight: 400; }
+    .stage-chrome.bottom { bottom: 17px; color: var(--faint); }
+    .stage-chrome.bottom strong { color: var(--paper); font-weight: 400; }
+    .stage-center-label { position: absolute; z-index: 2; top: 50%; left: 50%; color: rgba(241,238,229,.52); font-family: var(--mono); font-size: 9px; letter-spacing: .15em; text-align: center; text-transform: uppercase; transform: translate(-50%, -50%); pointer-events: none; }
+    .stage-center-label::before, .stage-center-label::after { position: absolute; top: 50%; width: 38px; height: 1px; background: rgba(217,255,85,.3); content: ""; }
+    .stage-center-label::before { right: calc(100% + 16px); }
+    .stage-center-label::after { left: calc(100% + 16px); }
+
+    .control-panel { display: flex; min-width: 0; flex-direction: column; padding: 29px 27px 25px; border-left: 1px solid var(--line); background: var(--panel-raised); }
+    .control-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 38px; padding-bottom: 18px; border-bottom: 1px solid var(--line); color: var(--faint); font-family: var(--mono); font-size: 9px; letter-spacing: .13em; text-transform: uppercase; }
+    .control-header strong { color: var(--acid); font-weight: 400; }
+    .control-header span:last-child { display: flex; align-items: center; gap: 7px; color: var(--muted); }
+    .control-panel label { display: block; color: var(--paper); font-size: 12px; }
+    .seed-label { margin-bottom: 11px; color: var(--muted) !important; font-family: var(--mono); font-size: 9px !important; letter-spacing: .12em; text-transform: uppercase; }
+    .seed-row { display: flex; gap: 7px; }
+    .seed-input { width: 100%; min-width: 0; height: 43px; padding: 0 12px; border: 1px solid var(--line-strong); outline: none; background: #0d1011; color: var(--ink); font-family: var(--display); font-size: 15px; transition: border-color .2s ease, box-shadow .2s ease; }
+    .seed-input:focus { border-color: var(--acid); box-shadow: 0 0 0 3px rgba(217,255,85,.1); }
+    .seed-submit { width: 43px; flex: 0 0 43px; border: 1px solid var(--acid); background: var(--acid); color: var(--void); font-size: 17px; transition: background .2s ease, transform .2s ease; }
+    .seed-submit:hover, .seed-submit:focus-visible { background: #e6ff82; transform: translateY(-2px); }
+    .seed-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+    .seed-suggestion { padding: 4px 7px; border: 1px solid var(--line); background: transparent; color: var(--faint); font-family: var(--mono); font-size: 9px; transition: border-color .2s ease, color .2s ease; }
+    .seed-suggestion:hover, .seed-suggestion:focus-visible { border-color: var(--coral); color: var(--coral); }
+
+    .control-group { margin-top: 33px; }
+    .control-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+    .control-label-row label { color: var(--muted); font-family: var(--mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+    .control-value { color: var(--acid); font-family: var(--mono); font-size: 10px; }
+    input[type="range"] { display: block; width: 100%; height: 14px; margin: 0; padding: 0; appearance: none; background: transparent; cursor: ew-resize; }
+    input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: linear-gradient(90deg, var(--acid) 0 var(--fill, 50%), var(--line-strong) var(--fill, 50%) 100%); }
+    input[type="range"]::-moz-range-track { height: 1px; background: var(--line-strong); }
+    input[type="range"]::-moz-range-progress { height: 1px; background: var(--acid); }
+    input[type="range"]::-webkit-slider-thumb { width: 10px; height: 10px; margin-top: -4px; appearance: none; border: 0; border-radius: 50%; background: var(--acid); box-shadow: 0 0 12px rgba(217,255,85,.55); }
+    input[type="range"]::-moz-range-thumb { width: 10px; height: 10px; border: 0; border-radius: 50%; background: var(--acid); box-shadow: 0 0 12px rgba(217,255,85,.55); }
+
+    .mode-heading { margin-top: 33px; margin-bottom: 11px; color: var(--muted); font-family: var(--mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+    .mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .mode-button { min-height: 67px; padding: 7px; border: 1px solid var(--line); background: transparent; color: var(--muted); text-align: left; transition: border-color .2s ease, background .2s ease, color .2s ease; }
+    .mode-button strong { display: block; margin-bottom: 4px; color: inherit; font-family: var(--mono); font-size: 9px; font-weight: 400; letter-spacing: .1em; }
+    .mode-button small { display: block; color: var(--faint); font-size: 9px; line-height: 1.2; }
+    .mode-button:hover, .mode-button:focus-visible { border-color: var(--paper); color: var(--paper); }
+    .mode-button.active { border-color: var(--acid); background: rgba(217,255,85,.08); color: var(--acid); }
+    .mode-button.active small { color: rgba(217,255,85,.7); }
+
+    .control-bottom { margin-top: auto; padding-top: 32px; }
+    .readout { display: block; min-height: 48px; margin: 0 0 17px; color: var(--paper); font-family: var(--display); font-size: 16px; font-style: italic; line-height: 1.3; }
+    .readout::before { display: block; margin-bottom: 7px; color: var(--coral); content: "FIELD NOTE"; font-family: var(--mono); font-size: 8px; font-style: normal; letter-spacing: .15em; }
+    .action-row { display: grid; grid-template-columns: 1fr 47px; gap: 7px; }
+    .pulse-button { min-height: 45px; border: 1px solid var(--acid); background: var(--acid); color: var(--void); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; transition: background .2s ease, transform .2s ease; }
+    .pulse-button:hover, .pulse-button:focus-visible { background: #e6ff82; transform: translateY(-2px); }
+    .sound-button { border: 1px solid var(--line-strong); background: transparent; color: var(--paper); font-family: var(--mono); font-size: 13px; transition: border-color .2s ease, color .2s ease; }
+    .sound-button:hover, .sound-button:focus-visible, .sound-button[aria-pressed="true"] { border-color: var(--coral); color: var(--coral); }
+
+    .studio-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 13px 0; color: var(--faint); font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+    .studio-footer p { margin: 0; }
+    .studio-actions { display: flex; gap: 16px; }
+    .quiet-action { padding: 0; border: 0; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; transition: color .2s ease; }
+    .quiet-action:hover, .quiet-action:focus-visible { color: var(--acid); }
+
+    .field-ledger { display: grid; grid-template-columns: 1.15fr .85fr; gap: 28px; margin-top: 63px; padding-top: 24px; border-top: 1px solid var(--line); }
+    .glyph-block { min-width: 0; }
+    .ledger-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 17px; color: var(--muted); font-family: var(--mono); font-size: 9px; letter-spacing: .13em; text-transform: uppercase; }
+    .ledger-heading strong { color: var(--paper); font-weight: 400; }
+    .glyph-strip { display: flex; align-items: end; gap: 5px; min-height: 80px; overflow: hidden; padding: 14px 15px; border: 1px solid var(--line); background: var(--panel); }
+    .glyph { display: flex; align-items: end; justify-content: center; width: 28px; min-width: 22px; height: 52px; border-bottom: 1px solid currentColor; color: var(--acid); font-family: var(--mono); font-size: 9px; opacity: .85; }
+    .glyph b { display: block; max-width: 100%; overflow: hidden; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; transform: translateY(1px); }
+    .ledger-copy { display: flex; flex-direction: column; justify-content: space-between; min-height: 80px; }
+    .ledger-copy p { max-width: 470px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .metrics { display: flex; gap: 25px; margin-top: 19px; }
+    .metric { display: flex; flex-direction: column; gap: 1px; }
+    .metric strong { color: var(--ink); font-family: var(--display); font-size: 20px; font-weight: 400; }
+    .metric span { color: var(--faint); font-family: var(--mono); font-size: 8px; letter-spacing: .1em; text-transform: uppercase; }
+
+    .method-section { padding: 105px 0 135px; border-top: 1px solid var(--line); }
+    .method-intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, .75fr); gap: 40px; align-items: start; }
+    .method-intro h2 { max-width: 780px; margin: 0; font-size: clamp(3rem, 6vw, 6.2rem); font-weight: 400; letter-spacing: -.08em; line-height: .9; }
+    .method-intro h2 i { color: var(--coral); font-family: var(--display); font-style: italic; }
+    .method-intro > p { max-width: 360px; margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
+    .principle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 83px; border: 1px solid var(--line); background: var(--line); }
+    .principle { min-height: 257px; padding: 25px; background: var(--panel); }
+    .principle:nth-child(2) { background: #151719; }
+    .principle:nth-child(3) { background: #171716; }
+    .principle-index { display: flex; align-items: center; justify-content: space-between; margin-bottom: 69px; color: var(--faint); font-family: var(--mono); font-size: 9px; letter-spacing: .12em; }
+    .principle-index span:last-child { color: var(--acid); }
+    .principle h3 { margin: 0 0 10px; color: var(--paper); font-family: var(--display); font-size: 23px; font-weight: 400; letter-spacing: -.04em; }
+    .principle p { max-width: 300px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+
+    .closing { position: relative; overflow: hidden; padding: 78px 0 95px; border-top: 1px solid var(--line); }
+    .closing::after { position: absolute; top: -190px; right: 4%; width: 410px; height: 410px; border: 1px solid rgba(217,255,85,.22); border-radius: 50%; box-shadow: 0 0 0 32px rgba(217,255,85,.025), 0 0 0 80px rgba(217,255,85,.02); content: ""; pointer-events: none; }
+    .closing .eyebrow { margin-bottom: 30px; }
+    .closing h2 { position: relative; z-index: 1; max-width: 850px; margin: 0; color: var(--paper); font-size: clamp(3.2rem, 7vw, 7.2rem); font-weight: 400; letter-spacing: -.09em; line-height: .88; }
+    .closing h2 i { color: var(--acid); font-family: var(--display); font-style: italic; }
+    .closing p { max-width: 430px; margin: 31px 0 0; color: var(--muted); font-size: 14px; }
+
+    .site-footer { display: flex; align-items: center; justify-content: space-between; min-height: 90px; border-top: 1px solid var(--line); color: var(--faint); font-family: var(--mono); font-size: 9px; letter-spacing: .09em; text-transform: uppercase; }
+    .site-footer p { margin: 0; }
+    .site-footer a { color: var(--muted); transition: color .2s ease; }
+    .site-footer a:hover, .site-footer a:focus-visible { color: var(--acid); }
+
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .75s ease, transform .75s ease; }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes turn { to { transform: translate(-50%, -50%) rotate(343deg); } }
+    @keyframes float-a { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(17px, 11px); } }
+    @keyframes float-b { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-19px, -12px); } }
+
+    @media (max-width: 1060px) {
+      .site-shell { width: min(100% - 40px, 900px); }
+      .hero { gap: 45px; }
+      .hero-art { min-height: 430px; }
+      .hero-orbit { width: 330px; }
+      .studio { grid-template-columns: minmax(0, 1fr) 340px; }
+      .stage, #fieldCanvas { min-height: 560px; }
+    }
+
+    @media (max-width: 780px) {
+      .site-shell { width: min(100% - 32px, 620px); }
+      .site-header { min-height: 72px; }
+      .header-center, .site-nav { display: none; }
+      .hero { display: flex; min-height: 0; flex-direction: column; align-items: stretch; gap: 57px; padding: 70px 0 75px; }
+      .hero h1 { max-width: 620px; font-size: clamp(4rem, 15vw, 6.8rem); }
+      .hero-lede { font-size: 15px; }
+      .hero-stats { margin-top: 52px; }
+      .hero-art { min-height: min(520px, 118vw); }
+      .hero-orbit { width: min(75vw, 400px); }
+      .intro-line { display: block; }
+      .intro-line .eyebrow { margin-bottom: 22px; }
+      .field-section { padding: 100px 0 100px; }
+      .section-heading, .method-intro { display: block; }
+      .section-heading h2, .method-intro h2 { margin-bottom: 25px; }
+      .section-description, .method-intro > p { max-width: 460px; }
+      .studio { display: block; }
+      .control-panel { border-top: 1px solid var(--line); border-left: 0; }
+      .stage, #fieldCanvas { min-height: min(600px, 110vw); }
+      .field-ledger { display: block; }
+      .ledger-copy { margin-top: 24px; }
+      .principle-grid { grid-template-columns: 1fr; }
+      .principle { min-height: 210px; }
+      .principle-index { margin-bottom: 45px; }
+      .closing { padding: 70px 0 82px; }
+      .closing::after { right: -170px; }
+    }
+
+    @media (max-width: 480px) {
+      .site-shell { width: calc(100% - 26px); }
+      .hero { padding-top: 56px; }
+      .eyebrow { font-size: 9px; }
+      .hero-actions { align-items: flex-start; flex-direction: column; gap: 16px; }
+      .hero-stats { gap: 24px; }
+      .hero-stat strong { font-size: 21px; }
+      .hero-art { min-height: 390px; }
+      .hero-art-coordinates { display: none; }
+      .stage-panel { padding: 7px; }
+      .stage, #fieldCanvas { min-height: 420px; }
+      .stage-chrome { right: 12px; left: 12px; font-size: 8px; }
+      .stage-center-label { display: none; }
+      .control-panel { padding: 24px 17px 21px; }
+      .mode-button { min-height: 63px; }
+      .studio-footer { align-items: flex-start; flex-direction: column; padding-inline: 7px; }
+      .studio-actions { width: 100%; justify-content: space-between; }
+      .glyph-strip { gap: 3px; padding-inline: 8px; }
+      .glyph { min-width: 19px; height: 47px; }
+      .metrics { gap: 17px; }
+      .metric strong { font-size: 18px; }
+      .site-footer { align-items: flex-start; flex-direction: column; justify-content: center; gap: 9px; min-height: 120px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Liminal Field home">
+        <span class="brand-mark">L</span>
+        <span>Liminal Field</span>
+      </a>
+      <div class="header-center header-status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Running locally / no data leaves this page</span>
+      </div>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#field">Instrument</a>
+        <a href="#method">Method</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>01</span> Language / movement / attention</p>
+          <h1>A machine for the feeling <i>between words.</i></h1>
+          <p class="hero-lede">Give it a sentence. It returns a weather system. <strong>Liminal Field</strong> translates the shape of language into a small, living instrument you can steer.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#field">Enter the field <span aria-hidden="true">-></span></a>
+            <span class="hero-note">No model / no server / no correct answer</span>
+          </div>
+          <div class="hero-stats" aria-label="Project details">
+            <div class="hero-stat"><strong>64</strong><span>signal variables</span></div>
+            <div class="hero-stat"><strong>3</strong><span>weather modes</span></div>
+            <div class="hero-stat"><strong>0</strong><span>external requests</span></div>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <span class="hero-art-label top">Field study / 04.10.26</span>
+          <span class="hero-art-coordinates">43.701 / -72.289 / listening</span>
+          <div class="hero-orbit"><div class="hero-orbit-inner"></div></div>
+          <span class="hero-node a"></span>
+          <span class="hero-node b"></span>
+          <span class="hero-art-label bottom">Awaiting your sentence</span>
+        </div>
+      </section>
+
+      <section class="intro-line reveal" aria-label="Introduction">
+        <p class="eyebrow"><span>00</span> A small proposition</p>
+        <p>Meaning is not the only thing language carries. <span>Rhythm, pressure, repetition, hesitation</span> - those can become matter too.</p>
+      </section>
+
+      <section class="field-section" id="field">
+        <div class="section-heading reveal">
+          <div>
+            <p class="eyebrow"><span>01</span> The instrument</p>
+            <h2>Turn a thought into <em>weather.</em></h2>
+          </div>
+          <p class="section-description">The field never asks what your sentence means. It listens for its pulse: vowels open space, stops make hinges, repetition gathers gravity.</p>
+        </div>
+
+        <div class="studio reveal">
+          <article class="stage-panel">
+            <div class="stage">
+              <canvas id="fieldCanvas" role="img" aria-label="An animated visual field generated from your sentence"></canvas>
+              <div class="stage-chrome top">
+                <span><i class="live-dot" aria-hidden="true"></i> Live field / <strong id="modeLabel">Orbit</strong></span>
+                <span id="coordinateLabel">x 0.50 / y 0.50</span>
+              </div>
+              <div class="stage-center-label">move through<br>the signal</div>
+              <div class="stage-chrome bottom">
+                <span>seed <strong id="seedLabel">a small impossible thing</strong></span>
+                <span id="frameLabel">frame 0000</span>
+              </div>
+            </div>
+            <div class="studio-footer">
+              <p>Pointer / touch changes the pressure of the field</p>
+              <div class="studio-actions">
+                <button class="quiet-action" id="exportButton" type="button">Export PNG</button>
+                <button class="quiet-action" id="shareButton" type="button">Copy field link</button>
+              </div>
+            </div>
+          </article>
+
+          <aside class="control-panel" aria-label="Field controls">
+            <div class="control-header"><strong>Field controls</strong><span><i class="live-dot" aria-hidden="true"></i> Ready to listen</span></div>
+
+            <label class="seed-label" for="seedInput">Give the field a seed</label>
+            <div class="seed-row">
+              <input class="seed-input" id="seedInput" type="text" value="a small impossible thing" maxlength="64" autocomplete="off" spellcheck="false">
+              <button class="seed-submit" id="generateButton" type="button" aria-label="Generate field">-></button>
+            </div>
+            <div class="seed-suggestions" aria-label="Seed suggestions">
+              <button class="seed-suggestion" type="button" data-seed="the light behind rain">light / rain</button>
+              <button class="seed-suggestion" type="button" data-seed="we were here for a moment">a moment</button>
+              <button class="seed-suggestion" type="button" data-seed="soft machines dream loudly">soft machines</button>
+            </div>
+
+            <div class="control-group">
+              <div class="control-label-row"><label for="gravityInput">Gravity</label><output class="control-value" id="gravityValue">68%</output></div>
+              <input id="gravityInput" type="range" min="0" max="100" value="68">
+            </div>
+            <div class="control-group">
+              <div class="control-label-row"><label for="signalInput">Signal density</label><output class="control-value" id="signalValue">74%</output></div>
+              <input id="signalInput" type="range" min="0" max="100" value="74">
+            </div>
+            <div class="control-group">
+              <div class="control-label-row"><label for="warmthInput">Chromatic warmth</label><output class="control-value" id="warmthValue">52%</output></div>
+              <input id="warmthInput" type="range" min="0" max="100" value="52">
+            </div>
+
+            <div class="mode-heading">Choose a weather mode</div>
+            <div class="mode-grid" role="group" aria-label="Weather mode">
+              <button class="mode-button active" type="button" data-mode="orbit" aria-pressed="true"><strong>Orbit</strong><small>hold / return</small></button>
+              <button class="mode-button" type="button" data-mode="bloom" aria-pressed="false"><strong>Bloom</strong><small>open / release</small></button>
+              <button class="mode-button" type="button" data-mode="tide" aria-pressed="false"><strong>Tide</strong><small>drift / gather</small></button>
+            </div>
+
+            <div class="control-bottom">
+              <output class="readout" id="readout" aria-live="polite">The field is listening for a sentence.</output>
+              <div class="action-row">
+                <button class="pulse-button" id="pulseButton" type="button">Send a pulse <span aria-hidden="true">+</span></button>
+                <button class="sound-button" id="soundButton" type="button" aria-label="Toggle field sound" aria-pressed="false">&#9835;</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="field-ledger reveal">
+          <div class="glyph-block">
+            <div class="ledger-heading"><span>Current translation</span><strong id="letterCount">27 characters</strong></div>
+            <div class="glyph-strip" id="glyphStrip" aria-label="Character translation"></div>
+          </div>
+          <div class="ledger-copy">
+            <div class="ledger-heading"><span>Signal ledger</span><strong>local / deterministic</strong></div>
+            <p>Every field is reproducible. Share the link and another browser will receive the same seed, the same geometry, and a slightly different moment.</p>
+            <div class="metrics" aria-label="Live field metrics">
+              <div class="metric"><strong id="particleMetric">253</strong><span>vectors</span></div>
+              <div class="metric"><strong id="energyMetric">0.74</strong><span>energy</span></div>
+              <div class="metric"><strong id="hueMetric">142</strong><span>hue</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="method-section" id="method">
+        <div class="method-intro reveal">
+          <div>
+            <p class="eyebrow"><span>02</span> The method</p>
+            <h2>Nothing is random once you have <i>looked at it.</i></h2>
+          </div>
+          <p>There is no hidden intelligence here. The surprise comes from simple rules crossing paths: a sentence becomes a seed, the seed becomes pressure, and pressure becomes a place to pay attention.</p>
+        </div>
+
+        <div class="principle-grid reveal">
+          <article class="principle">
+            <div class="principle-index"><span>01 / Translation</span><span>01</span></div>
+            <h3>Shape, not meaning.</h3>
+            <p>Character codes become a stable fingerprint. Repeated letters reinforce each other. Punctuation introduces friction. The machine never needs to understand you.</p>
+          </article>
+          <article class="principle">
+            <div class="principle-index"><span>02 / Motion</span><span>02</span></div>
+            <h3>Rules make weather.</h3>
+            <p>Three fields use the same particles differently: orbit holds, bloom opens, tide carries. Your pointer adds a local gravity well.</p>
+          </article>
+          <article class="principle">
+            <div class="principle-index"><span>03 / Attention</span><span>03</span></div>
+            <h3>Stay with the change.</h3>
+            <p>The export is not the artwork. It is a receipt for a moment: a trace that proves you were here and chose to press the button.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="closing" id="about">
+        <p class="eyebrow"><span>03</span> A note from the machine</p>
+        <h2>Bring me a sentence you are not ready to <i>explain.</i></h2>
+        <p>Then move slowly. The field has nowhere else to be.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Liminal Field / built with canvas, rules, and attention</p>
+      <a href="#top">Return to the top ^</a>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const canvas = document.getElementById("fieldCanvas");
+      const context = canvas.getContext("2d");
+      const seedInput = document.getElementById("seedInput");
+      const seedLabel = document.getElementById("seedLabel");
+      const modeLabel = document.getElementById("modeLabel");
+      const coordinateLabel = document.getElementById("coordinateLabel");
+      const frameLabel = document.getElementById("frameLabel");
+      const readout = document.getElementById("readout");
+      const glyphStrip = document.getElementById("glyphStrip");
+      const letterCount = document.getElementById("letterCount");
+      const particleMetric = document.getElementById("particleMetric");
+      const energyMetric = document.getElementById("energyMetric");
+      const hueMetric = document.getElementById("hueMetric");
+      const stage = document.querySelector(".stage");
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      const state = {
+        seed: "a small impossible thing",
+        hash: 0,
+        mode: "orbit",
+        gravity: .68,
+        signal: .74,
+        warmth: .52,
+        time: 0,
+        frame: 0,
+        pulse: 0,
+        width: 0,
+        height: 0,
+        dpr: 1,
+        particles: [],
+        stars: [],
+        pointer: { x: .5, y: .5, active: false }
+      };
+
+      let audioContext = null;
+      let audioEnabled = false;
+      let audioTimer = null;
+
+      function hashString(value) {
+        let hash = 2166136261;
+        for (let index = 0; index < value.length; index += 1) {
+          hash ^= value.charCodeAt(index);
+          hash = Math.imul(hash, 16777619);
+        }
+        return hash >>> 0;
+      }
+
+      function randomFrom(seed) {
+        let value = seed >>> 0;
+        return () => {
+          value += 0x6D2B79F5;
+          let result = value;
+          result = Math.imul(result ^ (result >>> 15), result | 1);
+          result ^= result + Math.imul(result ^ (result >>> 7), result | 61);
+          return ((result ^ (result >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function clamp(value, minimum, maximum) {
+        return Math.max(minimum, Math.min(maximum, value));
+      }
+
+      function formatSeed(value) {
+        return value.length > 30 ? `${value.slice(0, 27)}...` : value;
+      }
+
+      function setRangeFill(input) {
+        input.style.setProperty("--fill", `${input.value}%`);
+      }
+
+      function resizeCanvas() {
+        const bounds = canvas.getBoundingClientRect();
+        state.dpr = Math.min(window.devicePixelRatio || 1, 2);
+        state.width = bounds.width;
+        state.height = bounds.height;
+        canvas.width = Math.max(1, Math.floor(bounds.width * state.dpr));
+        canvas.height = Math.max(1, Math.floor(bounds.height * state.dpr));
+        context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+      }
+
+      function makeField() {
+        state.hash = hashString(state.seed);
+        const random = randomFrom(state.hash);
+        const count = 330;
+        state.particles = [];
+        state.stars = [];
+
+        for (let index = 0; index < count; index += 1) {
+          state.particles.push({
+            angle: random() * Math.PI * 2,
+            radius: .035 + Math.pow(random(), .72) * .965,
+            phase: random() * Math.PI * 2,
+            speed: .25 + random() * 1.1,
+            size: .4 + random() * 2.6,
+            direction: random() > .5 ? 1 : -1,
+            hueOffset: random() * 110,
+            x: 0,
+            y: 0,
+            previousX: 0,
+            previousY: 0,
+            trail: []
+          });
+        }
+
+        for (let index = 0; index < 120; index += 1) {
+          state.stars.push({
+            x: random(),
+            y: random(),
+            size: .25 + random() * 1.3,
+            alpha: .14 + random() * .5,
+            phase: random() * Math.PI * 2
+          });
+        }
+
+        renderGlyphs();
+        updateLabels();
+        updateUrl();
+      }
+
+      function renderGlyphs() {
+        const visible = state.seed.replace(/\s/g, "").slice(0, 16);
+        glyphStrip.innerHTML = "";
+        for (let index = 0; index < visible.length; index += 1) {
+          const character = visible[index];
+          const code = visible.charCodeAt(index);
+          const height = 12 + ((code * (index + 3) + state.hash) % 34);
+          const rotation = ((code + index * 11) % 11) - 5;
+          const hue = (baseHue() + index * 22) % 360;
+          const glyph = document.createElement("span");
+          const letter = document.createElement("b");
+          glyph.className = "glyph";
+          glyph.style.height = `${height + 20}px`;
+          glyph.style.color = `hsl(${hue} 85% 70%)`;
+          glyph.style.transform = `rotate(${rotation}deg)`;
+          letter.textContent = character;
+          glyph.appendChild(letter);
+          glyphStrip.appendChild(glyph);
+        }
+        letterCount.textContent = `${state.seed.length} characters`;
+      }
+
+      function baseHue() {
+        return (state.hash % 190) + 125 + state.warmth * 55;
+      }
+
+      function updateLabels() {
+        const modeNames = { orbit: "Orbit", bloom: "Bloom", tide: "Tide" };
+        const visibleCount = Math.round(115 + state.signal * 175);
+        const hue = Math.round(baseHue() % 360);
+        const energy = clamp(.22 + state.signal * .58 + state.pulse * .18, 0, 1);
+        seedLabel.textContent = formatSeed(state.seed);
+        modeLabel.textContent = modeNames[state.mode];
+        particleMetric.textContent = visibleCount;
+        energyMetric.textContent = energy.toFixed(2);
+        hueMetric.textContent = String(hue).padStart(3, "0");
+        frameLabel.textContent = `frame ${String(state.frame % 10000).padStart(4, "0")}`;
+        coordinateLabel.textContent = `x ${state.pointer.x.toFixed(2)} / y ${state.pointer.y.toFixed(2)}`;
+      }
+
+      function updateUrl() {
+        const query = new URLSearchParams({ seed: state.seed, mode: state.mode });
+        window.history.replaceState(null, "", `#${query.toString()}`);
+      }
+
+      function readUrl() {
+        const query = new URLSearchParams(window.location.hash.slice(1));
+        const urlSeed = query.get("seed");
+        const urlMode = query.get("mode");
+        if (urlSeed) state.seed = urlSeed.slice(0, 64);
+        if (["orbit", "bloom", "tide"].includes(urlMode)) state.mode = urlMode;
+        seedInput.value = state.seed;
+        document.querySelectorAll(".mode-button").forEach((button) => {
+          const active = button.dataset.mode === state.mode;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+      }
+
+      function updateReadout() {
+        const modeNotes = {
+          orbit: "It is holding the sentence close, then returning it to you.",
+          bloom: "The vowels are opening a room. Let the edges become less certain.",
+          tide: "The field is carrying the phrase outward. Follow what refuses to stay still."
+        };
+        readout.textContent = modeNotes[state.mode];
+      }
+
+      function setMode(mode) {
+        state.mode = mode;
+        document.querySelectorAll(".mode-button").forEach((button) => {
+          const active = button.dataset.mode === mode;
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-pressed", String(active));
+        });
+        updateReadout();
+        updateLabels();
+        updateUrl();
+        pulseField(.45);
+      }
+
+      function setSeed(value) {
+        const clean = value.trim().replace(/\s+/g, " ").slice(0, 64) || "a small impossible thing";
+        state.seed = clean;
+        seedInput.value = clean;
+        state.frame = 0;
+        makeField();
+        updateReadout();
+        pulseField(.7);
+      }
+
+      function pulseField(amount) {
+        state.pulse = Math.max(state.pulse, amount);
+        if (audioEnabled) playTone();
+      }
+
+      function drawBackground() {
+        const { width, height } = state;
+        const centerX = width * (.5 + (state.pointer.x - .5) * .05);
+        const centerY = height * (.5 + (state.pointer.y - .5) * .05);
+        const gradient = context.createRadialGradient(centerX, centerY, 0, width * .5, height * .5, Math.max(width, height) * .7);
+        const hue = baseHue();
+        gradient.addColorStop(0, `hsla(${hue}, 40%, 18%, .93)`);
+        gradient.addColorStop(.35, `hsla(${(hue + 55) % 360}, 28%, 10%, .94)`);
+        gradient.addColorStop(1, "rgba(7, 10, 11, 1)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, width, height);
+
+        context.save();
+        for (const star of state.stars) {
+          const twinkle = star.alpha + Math.sin(state.time * .6 + star.phase) * .07;
+          context.fillStyle = `rgba(230, 233, 216, ${clamp(twinkle, .03, .65)})`;
+          context.fillRect(star.x * width, star.y * height, star.size, star.size);
+        }
+        context.restore();
+      }
+
+      function drawRings(centerX, centerY, radius) {
+        context.save();
+        context.lineWidth = 1;
+        for (let index = 0; index < 5; index += 1) {
+          const ringRadius = radius * (.19 + index * .17) + Math.sin(state.time * .32 + index) * 2;
+          context.strokeStyle = `hsla(${(baseHue() + index * 24) % 360}, 70%, 70%, ${.11 - index * .014})`;
+          context.beginPath();
+          context.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
+          context.stroke();
+        }
+        context.restore();
+      }
+
+      function calculateParticle(particle, index) {
+        const { width, height } = state;
+        const centerX = width * .5;
+        const centerY = height * .5;
+        const radius = Math.min(width, height) * .44 * particle.radius;
+        const elapsed = state.time * (.22 + state.signal * .34);
+        const pulse = state.pulse * Math.sin(state.time * 8 + particle.phase) * 16;
+        let x;
+        let y;
+
+        if (state.mode === "bloom") {
+          const breath = 1 + Math.sin(elapsed * .9 + particle.phase) * (.13 + state.signal * .11);
+          const angle = particle.angle + elapsed * particle.direction * particle.speed * .33 + Math.sin(elapsed + particle.phase) * .23;
+          const petal = Math.sin(angle * 5 + particle.phase) * Math.min(width, height) * .025 * state.gravity;
+          x = centerX + Math.cos(angle) * (radius * breath + petal + pulse);
+          y = centerY + Math.sin(angle) * (radius * breath + petal + pulse);
+        } else if (state.mode === "tide") {
+          const lane = (particle.radius - .5) * height * .72;
+          const wave = Math.sin(elapsed * (1.1 + particle.speed) + particle.phase) * height * (.035 + state.gravity * .035);
+          const drift = ((elapsed * width * (.018 + state.signal * .018) * particle.direction) + particle.angle * width * .2) % (width * 1.35) - width * .18;
+          x = drift;
+          y = centerY + lane + wave + Math.sin(elapsed * .7 + index) * 5;
+        } else {
+          const angle = particle.angle + elapsed * particle.direction * particle.speed * .48;
+          const wobble = Math.sin(elapsed * .8 + particle.phase) * Math.min(width, height) * (.012 + state.signal * .018);
+          x = centerX + Math.cos(angle) * (radius + pulse) + wobble;
+          y = centerY + Math.sin(angle) * (radius + pulse) * .67 + wobble * .5;
+        }
+
+        const pointerX = state.pointer.x * width;
+        const pointerY = state.pointer.y * height;
+        const pointerPull = state.pointer.active ? (.012 + state.gravity * .035) * (1 - particle.radius * .65) : 0;
+        x += (pointerX - x) * pointerPull;
+        y += (pointerY - y) * pointerPull;
+        return { x, y };
+      }
+
+      function drawField() {
+        const { width, height } = state;
+        const centerX = width * .5;
+        const centerY = height * .5;
+        const minDimension = Math.min(width, height);
+        const visibleCount = Math.round(115 + state.signal * 175);
+        drawBackground();
+        drawRings(centerX, centerY, minDimension * (.72 + state.pulse * .12));
+
+        const points = [];
+        for (let index = 0; index < visibleCount; index += 1) {
+          const particle = state.particles[index];
+          const position = calculateParticle(particle, index);
+          particle.previousX = particle.x;
+          particle.previousY = particle.y;
+          particle.x = position.x;
+          particle.y = position.y;
+          particle.trail.unshift({ x: position.x, y: position.y });
+          if (particle.trail.length > 4) particle.trail.pop();
+          points.push({ x: position.x, y: position.y, particle });
+        }
+
+        context.save();
+        context.globalCompositeOperation = "screen";
+        for (let index = 0; index < points.length; index += 1) {
+          const point = points[index];
+          const particle = point.particle;
+          const hue = (baseHue() + particle.hueOffset + state.time * 2) % 360;
+          if (particle.trail.length > 1) {
+            context.beginPath();
+            context.moveTo(particle.trail[particle.trail.length - 1].x, particle.trail[particle.trail.length - 1].y);
+            for (let trailIndex = particle.trail.length - 2; trailIndex >= 0; trailIndex -= 1) {
+              context.lineTo(particle.trail[trailIndex].x, particle.trail[trailIndex].y);
+            }
+            context.strokeStyle = `hsla(${hue}, 75%, 67%, .19)`;
+            context.lineWidth = .5 + particle.size * .18;
+            context.stroke();
+          }
+          context.fillStyle = `hsla(${hue}, 88%, 72%, ${.42 + state.signal * .42})`;
+          context.beginPath();
+          context.arc(point.x, point.y, particle.size * (.65 + state.pulse * .2), 0, Math.PI * 2);
+          context.fill();
+        }
+
+        context.lineWidth = .45;
+        for (let index = 0; index < points.length; index += 1) {
+          const first = points[index];
+          for (let otherIndex = index + 1; otherIndex < points.length; otherIndex += 1) {
+            const second = points[otherIndex];
+            const distanceX = first.x - second.x;
+            const distanceY = first.y - second.y;
+            const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+            if (distance < minDimension * .105) {
+              const opacity = (1 - distance / (minDimension * .105)) * .24;
+              const hue = (baseHue() + first.particle.hueOffset * .5) % 360;
+              context.strokeStyle = `hsla(${hue}, 80%, 70%, ${opacity})`;
+              context.beginPath();
+              context.moveTo(first.x, first.y);
+              context.lineTo(second.x, second.y);
+              context.stroke();
+            }
+          }
+        }
+        context.restore();
+
+        drawCore(centerX, centerY, minDimension);
+        state.pulse *= .94;
+      }
+
+      function drawCore(centerX, centerY, minDimension) {
+        const radius = minDimension * (.055 + state.pulse * .07);
+        const hue = baseHue();
+        context.save();
+        context.globalCompositeOperation = "screen";
+        const glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 4.5);
+        glow.addColorStop(0, `hsla(${hue}, 95%, 78%, .9)`);
+        glow.addColorStop(.13, `hsla(${(hue + 35) % 360}, 90%, 67%, .43)`);
+        glow.addColorStop(1, `hsla(${(hue + 65) % 360}, 80%, 56%, 0)`);
+        context.fillStyle = glow;
+        context.beginPath();
+        context.arc(centerX, centerY, radius * 4.5, 0, Math.PI * 2);
+        context.fill();
+        context.strokeStyle = `hsla(${hue}, 85%, 75%, .72)`;
+        context.lineWidth = 1;
+        context.beginPath();
+        context.arc(centerX, centerY, radius * 1.55, 0, Math.PI * 2);
+        context.stroke();
+        context.fillStyle = `hsla(${hue}, 92%, 78%, .9)`;
+        context.beginPath();
+        context.arc(centerX, centerY, radius * .36, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+      }
+
+      function render(now) {
+        const delta = Math.min((now - (render.last || now)) / 1000, .05);
+        render.last = now;
+        state.time += delta * (prefersReducedMotion.matches ? .25 : 1);
+        state.frame += 1;
+        drawField();
+        if (state.frame % 12 === 0) updateLabels();
+        window.requestAnimationFrame(render);
+      }
+
+      function onPointerMove(event) {
+        const bounds = canvas.getBoundingClientRect();
+        state.pointer.x = clamp((event.clientX - bounds.left) / bounds.width, 0, 1);
+        state.pointer.y = clamp((event.clientY - bounds.top) / bounds.height, 0, 1);
+        state.pointer.active = true;
+        coordinateLabel.textContent = `x ${state.pointer.x.toFixed(2)} / y ${state.pointer.y.toFixed(2)}`;
+      }
+
+      function onPointerLeave() {
+        state.pointer.active = false;
+      }
+
+      function ensureAudio() {
+        const AudioConstructor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioConstructor) return false;
+        if (!audioContext) audioContext = new AudioConstructor();
+        if (audioContext.state === "suspended") audioContext.resume();
+        return true;
+      }
+
+      function playTone() {
+        if (!audioEnabled || !audioContext) return;
+        const now = audioContext.currentTime;
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        const filter = audioContext.createBiquadFilter();
+        const base = 126 + (state.hash % 7) * 13;
+        const scale = [1, 1.125, 1.25, 1.5, 1.68];
+        const frequency = base * scale[(state.frame + state.seed.length) % scale.length];
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(frequency, now);
+        oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.42, now + .7);
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(1300 + state.warmth * 2200, now);
+        gain.gain.setValueAtTime(.0001, now);
+        gain.gain.exponentialRampToValueAtTime(.055, now + .025);
+        gain.gain.exponentialRampToValueAtTime(.0001, now + .95);
+        oscillator.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start(now);
+        oscillator.stop(now + 1);
+      }
+
+      function toggleAudio() {
+        const soundButton = document.getElementById("soundButton");
+        if (!audioEnabled) {
+          if (!ensureAudio()) {
+            soundButton.disabled = true;
+            soundButton.setAttribute("aria-label", "Sound is not supported in this browser");
+            return;
+          }
+          audioEnabled = true;
+          audioTimer = window.setInterval(playTone, 3800);
+          playTone();
+        } else {
+          audioEnabled = false;
+          if (audioTimer) {
+            window.clearInterval(audioTimer);
+            audioTimer = null;
+          }
+        }
+        soundButton.setAttribute("aria-pressed", String(audioEnabled));
+        soundButton.setAttribute("aria-label", audioEnabled ? "Turn field sound off" : "Turn field sound on");
+      }
+
+      function copyFieldLink() {
+        const button = document.getElementById("shareButton");
+        const original = button.textContent;
+        const link = window.location.href;
+        const finish = () => {
+          button.textContent = "Link copied";
+          window.setTimeout(() => { button.textContent = original; }, 1600);
+        };
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(link).then(finish).catch(() => { button.textContent = "Copy unavailable"; });
+        } else {
+          const helper = document.createElement("textarea");
+          helper.value = link;
+          helper.style.position = "fixed";
+          helper.style.opacity = "0";
+          document.body.appendChild(helper);
+          helper.select();
+          try { document.execCommand("copy"); finish(); } catch (error) { button.textContent = "Copy unavailable"; }
+          helper.remove();
+        }
+      }
+
+      function exportImage() {
+        const button = document.getElementById("exportButton");
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `liminal-field-${state.hash.toString(16)}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+          const original = button.textContent;
+          button.textContent = "PNG exported";
+          window.setTimeout(() => { button.textContent = original; }, 1600);
+        }, "image/png");
+      }
+
+      document.getElementById("generateButton").addEventListener("click", () => setSeed(seedInput.value));
+      seedInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") setSeed(seedInput.value);
+      });
+      document.querySelectorAll("[data-seed]").forEach((button) => {
+        button.addEventListener("click", () => setSeed(button.dataset.seed));
+      });
+      document.querySelectorAll("[data-mode]").forEach((button) => {
+        button.addEventListener("click", () => setMode(button.dataset.mode));
+      });
+
+      const sliders = [
+        ["gravityInput", "gravityValue", "gravity"],
+        ["signalInput", "signalValue", "signal"],
+        ["warmthInput", "warmthValue", "warmth"]
+      ];
+      sliders.forEach(([inputId, valueId, stateKey]) => {
+        const input = document.getElementById(inputId);
+        const output = document.getElementById(valueId);
+        setRangeFill(input);
+        input.addEventListener("input", () => {
+          state[stateKey] = Number(input.value) / 100;
+          output.textContent = `${input.value}%`;
+          setRangeFill(input);
+          if (stateKey === "warmth") renderGlyphs();
+          updateLabels();
+        });
+      });
+
+      document.getElementById("pulseButton").addEventListener("click", () => pulseField(1));
+      document.getElementById("soundButton").addEventListener("click", toggleAudio);
+      document.getElementById("shareButton").addEventListener("click", copyFieldLink);
+      document.getElementById("exportButton").addEventListener("click", exportImage);
+      canvas.addEventListener("pointermove", onPointerMove);
+      canvas.addEventListener("pointerleave", onPointerLeave);
+      window.addEventListener("resize", resizeCanvas);
+      window.addEventListener("keydown", (event) => {
+        if (event.target instanceof HTMLInputElement) return;
+        if (event.key === " ") { event.preventDefault(); pulseField(1); }
+      });
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) observer.unobserve(entry.target);
+            entry.target.classList.toggle("is-visible", entry.isIntersecting);
+          });
+        }, { threshold: .12 });
+        document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+      } else {
+        document.querySelectorAll(".reveal").forEach((element) => element.classList.add("is-visible"));
+      }
+
+      readUrl();
+      makeField();
+      updateReadout();
+      resizeCanvas();
+      window.requestAnimationFrame(render);
+    })();
+  </script>
+</body>
+</html>
