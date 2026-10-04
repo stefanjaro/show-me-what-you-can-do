@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROTOGAIA — A world that builds itself</title>
+<meta name="description" content="A complete artificial life simulator. Watch and shape a 2D world where creatures with neural-network brains are born, eat, fight, mate, mutate, and speciate over thousands of generations.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="topbar">
+  <div class="brand">
+    <span class="logo">◉</span>
+    <span class="title">PROTOGAIA</span>
+    <span class="sub">a world that builds itself</span>
+  </div>
+  <div class="stats" id="hudStats">
+    <div class="stat"><span class="k">GEN</span><span class="v" id="statGen">0</span></div>
+    <div class="stat"><span class="k">AGE</span><span class="v" id="statAge">0.0 y</span></div>
+    <div class="stat"><span class="k">POP</span><span class="v" id="statPop">0</span></div>
+    <div class="stat"><span class="k">SPP</span><span class="v" id="statSpp">0</span></div>
+    <div class="stat"><span class="k">EXT</span><span class="v" id="statExt">0</span></div>
+    <div class="stat"><span class="k">FPS</span><span class="v" id="statFps">0</span></div>
+  </div>
+  <div class="ctrls">
+    <button id="btnPlayPause" class="btn primary" title="Pause / Resume">❚❚ Pause</button>
+    <button id="btnStep" class="btn" title="Step once">Step</button>
+    <button id="btnSpeed" class="btn" title="Cycle speed">Speed ×1</button>
+    <button id="btnSound" class="btn" title="Toggle sound">♪ On</button>
+    <button id="btnReset" class="btn danger" title="Reset world">Reset</button>
+  </div>
+</header>
+
+<main id="stage">
+  <aside id="panelLeft" class="panel">
+    <h2>Brushes</h2>
+    <p class="hint">Click on the canvas to use a brush. Hold <kbd>Shift</kbd> to remove.</p>
+    <div class="brushList" id="brushList"></div>
+
+    <h2>Mode</h2>
+    <div class="seg" id="modeSeg">
+      <button data-mode="paint" class="on">Paint</button>
+      <button data-mode="follow">Follow</button>
+      <button data-mode="control">Control</button>
+      <button data-mode="observe">Observe</button>
+    </div>
+
+    <h2>View</h2>
+    <div class="seg" id="viewSeg">
+      <button data-view="surface" class="on">Surface</button>
+      <button data-view="traits">Traits</button>
+      <button data-view="energy">Energy</button>
+      <button data-view="xray">X-ray</button>
+    </div>
+
+    <h2>Time of day</h2>
+    <div class="slider">
+      <input type="range" id="timeSlider" min="0" max="100" value="25">
+      <span id="timeLabel">06:00</span>
+    </div>
+    <div class="checkrow">
+      <label><input type="checkbox" id="autoTime" checked> Auto-advance</label>
+    </div>
+  </aside>
+
+  <canvas id="world" width="1200" height="800"></canvas>
+
+  <aside id="panelRight" class="panel">
+    <div class="tabs" id="tabs">
+      <button data-tab="info" class="on">Info</button>
+      <button data-tab="species">Species</button>
+      <button data-tab="tree">Tree</button>
+      <button data-tab="graph">Graphs</button>
+      <button data-tab="chronicle">Chronicle</button>
+      <button data-tab="help">Help</button>
+    </div>
+
+    <section class="tab" data-tab="info">
+      <h3>Selected</h3>
+      <div id="infoEmpty" class="empty">Click any creature to inspect its body, brain and genome.</div>
+      <div id="infoBody" hidden>
+        <table>
+          <tr><td>Species</td><td id="infSpecies">—</td></tr>
+          <tr><td>Generation</td><td id="infGen">—</td></tr>
+          <tr><td>Age</td><td id="infAge">—</td></tr>
+          <tr><td>Energy</td><td id="infEnergy">—</td></tr>
+          <tr><td>Health</td><td id="infHealth">—</td></tr>
+          <tr><td>Parents</td><td id="infParents">—</td></tr>
+          <tr><td>Children</td><td id="infChildren">—</td></tr>
+        </table>
+        <div class="bar"><div id="barEnergy"></div></div>
+        <div class="bar"><div id="barHealth"></div></div>
+
+        <h4>Brain activity</h4>
+        <canvas id="brainCanvas" width="240" height="160"></canvas>
+
+        <h4>Stats</h4>
+        <table>
+          <tr><td>Top speed</td><td id="infSpeed">—</td></tr>
+          <tr><td>Stomach</td><td id="infStomach">—</td></tr>
+          <tr><td>Vision</td><td id="infVision">—</td></tr>
+          <tr><td>Size</td><td id="infSize">—</td></tr>
+          <tr><td>Lifespan</td><td id="infLife">—</td></tr>
+          <tr><td>Offspring</td><td id="infKids">—</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="tab" data-tab="species" hidden>
+      <h3>Living species</h3>
+      <p class="hint">Sorted by population. Click to track.</p>
+      <div id="speciesList" class="list"></div>
+    </section>
+
+    <section class="tab" data-tab="tree" hidden>
+      <h3>Tree of life</h3>
+      <p class="hint">Phylogeny of every species that has lived. Click a node to focus its descendants.</p>
+      <canvas id="treeCanvas" width="320" height="600"></canvas>
+    </section>
+
+    <section class="tab" data-tab="graph" hidden>
+      <h3>Ecosystem</h3>
+      <canvas id="graphCanvas" width="320" height="640"></canvas>
+    </section>
+
+    <section class="tab" data-tab="chronicle" hidden>
+      <h3>Chronicle of deep time</h3>
+      <p class="hint">First births, extinctions and major evolutionary shifts.</p>
+      <div id="chronicleList" class="list"></div>
+    </section>
+
+    <section class="tab" data-tab="help" hidden>
+      <h3>How to play</h3>
+      <p>PROTOGAIA is an artificial life simulator. Drop a few creatures into a tiny pocket of land and watch what happens over thousands of generations.</p>
+      <ul>
+        <li><b>Paint</b> the world with food, plants, water, walls or hot spots using the brushes on the left.</li>
+        <li><b>Follow</b> a specific creature to see its daily life.</li>
+        <li><b>Control</b> a creature by pressing keys (WASD/Arrows + Space).</li>
+        <li><b>Observe</b> free-roaming with the mouse.</li>
+        <li>The <b>tree</b> and <b>graphs</b> tabs show long-term evolution.</li>
+        <li>The <b>chronicle</b> records every speciation and extinction in writing.</li>
+      </ul>
+      <p>There is no goal. The world is yours to perturb — or to leave alone.</p>
+
+      <h4>Tips</h4>
+      <ul>
+        <li>Press <kbd>R</kbd> to spawn a starter creature at the cursor.</li>
+        <li>Press <kbd>F</kbd> to add food under the cursor.</li>
+        <li>Press <kbd>1</kbd>–<kbd>9</kbd> to switch brushes from the keyboard.</li>
+        <li>Press <kbd>Space</kbd> to pause, <kbd>.</kbd> to step a single frame.</li>
+        <li>Press <kbd>+</kbd> / <kbd>-</kbd> to cycle simulation speed.</li>
+      </ul>
+
+      <h4>About</h4>
+      <p>Every line of this world — the physics, the brains, the genomes, the music — is written from scratch. No libraries, no assets, no build step. Open <code>js/</code> in the repo to read the source.</p>
+    </section>
+  </aside>
+</main>
+
+<div id="overlay" class="overlay">
+  <div class="card">
+    <h1>PROTOGAIA</h1>
+    <p class="lead">A world that builds itself.</p>
+    <p>Drop a handful of neural-network-brained creatures onto a procedurally generated continent and watch what they do over thousands of generations. Eat, fight, mate, mutate. Speciate. Go extinct. Speciate again.</p>
+    <ul class="kvlist">
+      <li><b>Heads up</b> · sound is on, music is procedural and reactive to the ecosystem</li>
+      <li><b>Tip</b> · press <kbd>1</kbd>–<kbd>7</kbd> to swap brushes from the keyboard</li>
+      <li><b>Tip</b> · <kbd>Tab</kbd> cycles between paint / follow / control / observe</li>
+      <li><b>Tip</b> · open the <b>Tree</b> and <b>Chronicle</b> tabs to watch deep time unfold</li>
+    </ul>
+    <button id="btnBegin" class="btn primary big">Awaken the world →</button>
+    <p class="small">click anywhere to begin · audio recommended</p>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="js/utils.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/brain.js"></script>
+<script src="js/genome.js"></script>
+<script src="js/creature.js"></script>
+<script src="js/world.js"></script>
+<script src="js/evolution.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
