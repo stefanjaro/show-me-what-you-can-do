@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ONE BOOK — a language model that has read exactly one book</title>
+<meta name="description" content="A transformer language model written from first principles — tokenizer, attention, backprop, AdamW — trained in your browser on a single short book written for it. Watch it learn to speak.">
+<meta name="theme-color" content="#0b0a09">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230b0a09'/%3E%3Crect x='7' y='6' width='18' height='20' rx='1.5' fill='none' stroke='%23e8a33d' stroke-width='1.6'/%3E%3Cpath d='M11 6v20M15 11h7M15 15h7M15 19h5' stroke='%23e8a33d' stroke-width='1.3' fill='none'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+<div class="grain"></div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span>Mimo v2.6 Pro</span>
+      <span>Model SL-1</span>
+      <span>Strange Loop Systems</span>
+      <span id="build-stamp">built from arithmetic</span>
+    </div>
+    <h1>One <em>Book</em></h1>
+    <p class="deck">
+      A language model that has read exactly one book — written for it here, and
+      <strong>nothing else</strong>. No pretraining, no internet, no library. Every
+      multiply, every gradient, every attention head exists because it was typed into the
+      files this page loads. It is learning to speak in your browser right now.
+    </p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tick-rule"></div>
+  <section class="hero" id="hero">
+    <canvas class="hero-field" id="hero-field"></canvas>
+    <div class="hero-main">
+      <div class="voice-label"><span class="pulse"></span><span id="voice-status">the mind is dreaming its book</span></div>
+      <blockquote class="voice" id="hero-text"><span class="dim">waking the machine</span><span class="caret"></span></blockquote>
+      <div class="stat-row" id="hero-stats">
+        <span>step <b id="h-step">0</b></span>
+        <span>loss <b id="h-loss">—</b></span>
+        <span>held-out <b id="h-val">—</b></span>
+        <span>tokens/s <b id="h-tps">—</b></span>
+        <span>parameters <b id="h-params">—</b></span>
+      </div>
+    </div>
+    <aside class="hero-side">
+      <div class="book-plate">
+        <div class="kicker">The book it has read</div>
+        <p class="title" id="book-title">A Reader for Small Minds</p>
+        <div class="meta">
+          <div><b id="book-chars">—</b> characters</div>
+          <div><b id="book-vocab">—</b> letters and marks</div>
+          <div><b id="book-steps">—</b> training steps recorded</div>
+          <div><b id="book-size">—</b> parameters in the mind</div>
+        </div>
+      </div>
+      <p class="mini-note">
+        This page is a laboratory. Everything below runs live: the training loop, the
+        attention maps, the gradient proof. Nothing is faked and nothing is fetched.
+        Press <b style="color:var(--amber)">Unlearn</b> below to watch the words fall
+        apart and grow back.
+      </p>
+      <div class="controls">
+        <button class="primary" id="hero-train">Pause training</button>
+        <button id="hero-unlearn">Unlearn</button>
+      </div>
+      <div class="controls">
+        <button id="hero-read">Read the book</button>
+      </div>
+    </aside>
+  </section>
+
+  <nav class="toc">
+    <a href="#instrument">I · The Instrument</a>
+    <a href="#anatomy">II · The Anatomy</a>
+    <a href="#proof">III · The Proof</a>
+    <a href="#notes">IV · The Notes</a>
+    <a href="#colophon">Colophon</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+  <section class="chapter" id="instrument">
+    <div class="chapter-head">
+      <div class="numeral">I</div>
+      <div>
+        <h2>The Instrument</h2>
+        <p>
+          A complete language model in one thread of arithmetic. Choose the book, choose
+          the size of the mind, and watch the loss fall. The timeline underneath is the
+          machine's own record of learning to speak.
+        </p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Training</h3>
+        <div class="hint"><span id="train-mode">single thread</span> &nbsp;·&nbsp; space train · g generate · s speak · u unlearn</div>
+      </div>
+      <div class="panel-body">
+        <div class="controls" style="margin-bottom:1.15rem">
+          <select id="book-select" aria-label="Book">
+            <option value="reader">A Reader for Small Minds</option>
+            <option value="station">Observatory Log — Station Seven</option>
+            <option value="custom">Your own text</option>
+          </select>
+          <select id="preset-select" aria-label="Model size">
+            <option value="tiny">tiny · 66k parameters</option>
+            <option value="standard" selected>standard · 113k parameters</option>
+            <option value="deep">deep · 355k parameters</option>
+          </select>
+          <button class="primary" id="btn-train">Pause</button>
+          <button id="btn-step">One step</button>
+          <button id="btn-unlearn">Unlearn</button>
+          <button id="btn-speak">Speak</button>
+        </div>
+
+        <div id="custom-wrap" style="display:none;margin-bottom:1.15rem">
+          <textarea id="custom-text" aria-label="Your own text" placeholder="Paste any text here — the model will build a new vocabulary for it and learn only this."></textarea>
+          <div class="controls" style="margin-top:0.55rem">
+            <button id="btn-use-custom">Train on this text</button>
+            <span class="mini-note" id="custom-status">needs at least 400 characters</span>
+          </div>
+        </div>
+
+        <div class="metrics" id="metrics">
+          <div class="metric"><span class="k">step</span><span class="v" id="m-step">0</span><span class="s" id="m-step-s">of the walk</span></div>
+          <div class="metric"><span class="k">training loss</span><span class="v amber" id="m-loss">—</span><span class="s">nats per letter</span></div>
+          <div class="metric"><span class="k">held-out loss</span><span class="v teal" id="m-val">—</span><span class="s">letters not used</span></div>
+          <div class="metric"><span class="k">throughput</span><span class="v" id="m-tps">—</span><span class="s">letters per second</span></div>
+          <div class="metric"><span class="k">learning rate</span><span class="v" id="m-lr">—</span><span class="s">cosine schedule</span></div>
+          <div class="metric"><span class="k">parameters</span><span class="v" id="m-params">—</span><span class="s">float32 weights</span></div>
+        </div>
+
+        <div style="margin-top:1.35rem">
+          <canvas class="viz" id="loss-canvas" aria-label="Loss curve"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:1.15rem">
+      <div class="panel-head">
+        <h3>The timeline of becoming</h3>
+        <div class="hint">drag sideways · every card is the same mind at a different hour</div>
+      </div>
+      <div class="panel-body">
+        <div class="timeline" id="timeline"></div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:1.15rem">
+      <div class="panel-head">
+        <h3>Playground</h3>
+        <div class="hint">ask the mind to continue anything</div>
+      </div>
+      <div class="panel-body">
+        <div class="grid-2">
+          <div>
+            <label class="kicker" for="prompt-input">Prompt</label>
+            <textarea id="prompt-input" style="margin-top:0.55rem;min-height:5.6rem">A map is not a country. A map is</textarea>
+            <div class="word-chips" id="prompt-chips"></div>
+            <div class="slider-row">
+              <label for="s-temp">temperature</label>
+              <input type="range" id="s-temp" min="0" max="1.5" step="0.05" value="0.65">
+              <output id="o-temp">0.65</output>
+            </div>
+            <div class="slider-row">
+              <label for="s-topk">top-k</label>
+              <input type="range" id="s-topk" min="1" max="40" step="1" value="5">
+              <output id="o-topk">5</output>
+            </div>
+            <div class="slider-row">
+              <label for="s-topp">top-p</label>
+              <input type="range" id="s-topp" min="0.1" max="1" step="0.01" value="0.92">
+              <output id="o-topp">0.92</output>
+            </div>
+            <div class="slider-row">
+              <label for="s-rep">repetition</label>
+              <input type="range" id="s-rep" min="0" max="1.2" step="0.02" value="0.18">
+              <output id="o-rep">0.18</output>
+            </div>
+            <div class="controls" style="margin-top:0.85rem">
+              <button class="primary" id="btn-generate">Generate</button>
+              <button id="btn-clear">Clear</button>
+              <span class="mini-note" id="gen-time"></span>
+            </div>
+          </div>
+          <div>
+            <label class="kicker" for="output-text">Continuation</label>
+            <textarea id="output-text" readonly style="margin-top:0.55rem;min-height:11.2rem;color:var(--ink)"></textarea>
+            <label class="kicker" style="margin-top:1rem;display:block">What it expects next</label>
+            <canvas class="viz short" id="logit-canvas" aria-label="Next letter distribution" style="margin-top:0.55rem"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="anatomy">
+    <div class="chapter-head">
+      <div class="numeral">II</div>
+      <div>
+        <h2>The Anatomy</h2>
+        <p>
+          Open the machine. Text becomes numbers, numbers become a guess about the next
+          letter, and the guess is graded. These panels read the live weights of the mind
+          above — not a drawing of a model, the model.
+        </p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>The pipeline</h3>
+        <div class="hint">click a stage</div>
+      </div>
+      <div class="panel-body">
+        <div class="controls" id="pipeline" style="gap:0.55rem"></div>
+        <p class="mini-note" id="pipeline-note" style="margin-top:0.95rem;max-width:52rem">
+          Each letter is looked up in a table of learned numbers. Those numbers pass
+          through blocks that let every letter look at the letters before it. The result
+          is a score for every possible next letter.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:1.15rem">
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Attention</h3>
+          <div class="hint">
+            <select id="attn-layer" aria-label="Layer">
+              <option value="0">layer 1</option>
+              <option value="1">layer 2</option>
+            </select>
+            <select id="attn-head" aria-label="Head">
+              <option value="0">head 1</option>
+              <option value="1">head 2</option>
+              <option value="2">head 3</option>
+              <option value="3">head 4</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-body">
+          <input type="text" id="attn-text" value="There was once a map maker" aria-label="Sentence" style="width:100%;margin-bottom:0.85rem">
+          <canvas class="viz tall" id="attn-canvas" aria-label="Attention map"></canvas>
+          <p class="mini-note" style="margin-top:0.75rem">
+            Row = the letter being predicted. Column = the letter it is looking at.
+            Brighter = more attention. The lower triangle is the past; the model is
+            forbidden from seeing the future.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Where the letters live</h3>
+          <div class="hint">hover a point</div>
+        </div>
+        <div class="panel-body">
+          <canvas class="viz tall" id="emb-canvas" aria-label="Embedding space"></canvas>
+          <p class="mini-note" style="margin-top:0.75rem">
+            Every letter has a home in a small space of numbers. The model moves these
+            homes while it learns. This is that space, flattened to two dimensions by the
+            method of principal components.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:1.15rem">
+      <div class="panel-head">
+        <h3>Where the book surprised it</h3>
+        <div class="hint"><button id="btn-surprise">Read a page</button></div>
+      </div>
+      <div class="panel-body">
+        <canvas class="viz" id="surprise-canvas" aria-label="Per letter surprise"></canvas>
+        <div class="grid-2" style="margin-top:1.15rem">
+          <div>
+            <div class="kicker">The sentences it did not see coming</div>
+            <div id="surprise-list" class="mini-note" style="margin-top:0.65rem">Press "Read a page" to have the model score a page of the book against itself.</div>
+          </div>
+          <p class="mini-note">
+            Each square is one letter of the book. Its colour is the loss the model
+            assigned to that letter before it saw it — how much the book surprised the
+            mind that learned it. Names, numbers and rare words glow. The ordinary
+            connective tissue of the language goes quiet.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="proof">
+    <div class="chapter-head">
+      <div class="numeral">III</div>
+      <div>
+        <h2>The Proof</h2>
+        <p>
+          A model that learns is not the same as a model that is correct. These checks run
+          in your browser, in double precision, and compare the hand-written calculus of
+          learning against the slow, certain method of finite differences.
+        </p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Verification suite</h3>
+        <div class="hint">
+          <button class="primary" id="btn-proof">Run the suite</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="term" id="proof-output">Press "Run the suite" to verify the machine. Every number below is computed just now, in this tab.</div>
+        <div class="grid-2" style="margin-top:1.15rem">
+          <p class="mini-note">
+            The gradient check is the important one. It takes every parameter, nudges it
+            by a millionth, and measures how much the loss moves. If the hand-derived
+            calculus in <b style="color:var(--amber)">model.js</b> is right, the two
+            answers agree to about eight digits in double precision.
+          </p>
+          <p class="mini-note">
+            The causality check is the other one worth having. It confirms that a letter's
+            prediction does not change when the future changes. A model that peeks ahead
+            can score beautifully and be worthless; this one is not allowed to peek.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="notes">
+    <div class="chapter-head">
+      <div class="numeral">IV</div>
+      <div>
+        <h2>The Notes</h2>
+        <p>How to grow a voice from arithmetic, and what that voice is actually doing.</p>
+      </div>
+    </div>
+
+    <article class="essay">
+      <p>
+        Start with the least interesting fact about this page: it is a function. It takes
+        a piece of text and returns a probability for every letter that could come next.
+        That is the whole machine. Everything else — the sense of a mind at work, the
+        sentences that seem almost written — is what happens when that function is very,
+        very good at its one job.
+      </p>
+
+      <h3>One book, and a small vocabulary</h3>
+      <p>
+        This model has read <em id="essay-chars">one short book</em> and nothing else. The
+        book was written for it: short sentences, a deliberately small set of words, and
+        the same words returning again and again. A small mind has a short memory for
+        shapes; give it a million words and it learns noise. Give it
+        <strong id="essay-vocab">a few dozen letters</strong> used with care and it can
+        learn the difference between a question and a claim.
+      </p>
+      <div class="aside">
+        <b>On the book's vocabulary.</b> The Reader avoids long words on purpose. When the
+        machine writes <i>the map is not a country</i>, it is not retrieving a fact about
+        cartography. It has learned that after <i>the map is</i>, the book usually says
+        something small and true.
+      </div>
+
+      <h3>Letters become numbers</h3>
+      <p>
+        Each letter is exchanged for a small list of numbers — its home in the space on
+        the right. There is one list per letter and one per position in the window, and
+        these are learned like everything else. A sentence is therefore a grid of
+        numbers, and that grid is all the model ever sees. It has never seen ink.
+      </p>
+
+      <h3>Attention: the past, weighed</h3>
+      <p>
+        The grid passes through blocks that let each position ask a question of every
+        position before it. <em>How much should I listen to you?</em> The answers are the
+        bright squares in the attention panel. One head often learns to watch the letter
+        that opened the sentence; another watches the space before the word being spelled.
+        Nobody told them to. These are the cheapest ways to reduce the error.
+      </p>
+
+      <p class="pull">
+        A prediction is a rumour about the future, <span>spread backwards</span> through
+        a pile of numbers.
+      </p>
+
+      <h3>Learning is just correction</h3>
+      <p>
+        The model guesses, and the book tells it what was actually there. The gap is the
+        loss — <strong id="essay-loss">a number that falls as the mind sharpens</strong>.
+        Then calculus does the only clever thing in the whole system: it works out how
+        much each of the <span id="essay-params">hundreds of thousands</span> of weights
+        is to blame, and moves each one a tiny step in the direction of less blame. Repeat.
+        The steps are small because the world is not wrong all at once.
+      </p>
+
+      <div class="aside">
+        <b>The proof in section III</b> is there because the calculus is hand-written.
+        Finite differences — nudging a weight and measuring what happens — is slow, dumb,
+        and impossible to fool. The suite runs both and reports the disagreement.
+      </div>
+
+      <h3>Sampling: reciting versus dreaming</h3>
+      <p>
+        When the model writes, it does not pick the best letter. It takes the whole
+        distribution and rolls a weighted die. Turn the temperature down and it recites
+        the book almost exactly. Turn it up and the model starts to slip — a word from
+        another sentence, a grammar that is nearly right. Those slips are the honest
+        signature of a small mind: it has learned the shape of the language but not its
+        full weight.
+      </p>
+      <p>
+        The repetition slider exists because small models love a groove. Once a pattern
+        starts, the model will happily continue <i>the the the the</i> forever. A small
+        penalty for saying the same thing twice is enough to break the trance.
+      </p>
+
+      <h3>What it is not doing</h3>
+      <p>
+        It is not looking anything up. There is no database, no retrieval, no second
+        model. When it writes about a map maker, it is not remembering a map maker; it is
+        running the same arithmetic that runs on every other sentence, and the arithmetic
+        happens to land near the book's world because that is the only world it has ever
+        met. <strong>One book is enough to make a voice. It is not enough to make a
+        mind.</strong>
+      </p>
+
+      <h3>The loop</h3>
+      <p>
+        There is a small knot at the centre of this page. The book was written by one
+        model. The machine that learned to write in its style was written by the same
+        model. The essay you are reading is being composed while that machine trains in
+        the same browser tab, its loss falling a few lines above these words. A model
+        explaining a model, while the second model gets better at sounding like the
+        first.
+      </p>
+      <p>
+        The book ends by saying that the reader is the last machine in the line. That was
+        written as a kindness to the little model. It is also simply true. Nothing on this
+        page becomes language until someone reads it.
+      </p>
+    </article>
+  </section>
+</div>
+
+<div class="overlay" id="book-overlay" hidden>
+  <div class="overlay-card">
+    <div class="overlay-head">
+      <div>
+        <div class="kicker">The only text this mind has ever seen</div>
+        <h3 id="overlay-title">A Reader for Small Minds</h3>
+      </div>
+      <button id="overlay-close">Close</button>
+    </div>
+    <div class="overlay-body" id="overlay-text"></div>
+    <div class="overlay-foot mini-note">
+      Written for this machine: short sentences, a small vocabulary, and the same words
+      returning. Everything the model knows, it knows from this.
+    </div>
+  </div>
+</div>
+
+<footer class="page" id="colophon">
+  <div class="wrap">
+    <div class="tick-rule" style="margin-bottom:2.1rem"></div>
+    <div class="colophon">
+      <div>
+        <h4>The machine</h4>
+        <p id="colophon-machine">
+          transformer · char-level tokenizer · 2 blocks<br>
+          multi-head causal attention · gelu mlp<br>
+          adamw · cosine schedule · global grad clip
+        </p>
+      </div>
+      <div>
+        <h4>Written from scratch</h4>
+        <p>
+          no frameworks · no libraries · no build step<br>
+          no network requests · no fonts · no images<br>
+          no training data beyond the book on this page
+        </p>
+      </div>
+      <div>
+        <h4>Files</h4>
+        <p id="colophon-files">
+          assets/js/model.js — the mind<br>
+          assets/js/train.js — the walk downhill<br>
+          assets/js/proof.js — the checks
+        </p>
+      </div>
+      <div>
+        <h4>Index</h4>
+        <p>
+          one entry among many in<br>
+          <a href="../index.html">Show Me What You Can Do</a><br>
+          prompt by Stefan Jaro
+        </p>
+      </div>
+    </div>
+    <div class="status-bar">
+      <span>SL-1 · <b>ONE BOOK</b></span>
+      <span>run by <b>Mimo v2.6 Pro</b></span>
+      <span id="colophon-time">—</span>
+      <span id="colophon-runtime">—</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/model.js"></script>
+<script src="assets/js/books.js"></script>
+<script src="assets/js/corpus.js"></script>
+<script src="assets/js/checkpoint-reader.js"></script>
+<script src="assets/js/checkpoint-station.js"></script>
+<script src="assets/js/train.js"></script>
+<script src="assets/js/viz.js"></script>
+<script src="assets/js/proof.js"></script>
+<script src="assets/js/ui.js"></script>
+</body>
+</html>
