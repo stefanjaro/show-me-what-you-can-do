@@ -34,19 +34,22 @@ section.entries{padding-top:clamp(2.5rem,7vh,4rem)}
 table{width:100%;border-collapse:collapse}
 th,td{text-align:left;vertical-align:top;padding:.85rem 1rem .85rem 0;border-bottom:1px solid var(--line)}
 th{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);white-space:nowrap}
-td.model{font-weight:600;white-space:nowrap}
-td.work{white-space:nowrap}
+td.model{font-weight:600;width:26%}
+td.model .run{display:block;margin-top:.35rem;font-size:.8rem;font-weight:400;line-height:1.55;color:var(--muted)}
+td.model .run b{color:var(--fg);font-weight:600}
 td.desc{color:var(--muted);font-size:.94rem}
 td.desc strong{color:var(--fg);font-weight:600}
-td.run{color:var(--muted);font-size:.94rem;white-space:nowrap}
-td.run b{color:var(--fg);font-weight:600}
+td.work{color:var(--muted);font-size:.94rem;white-space:nowrap;width:1%;text-align:right}
+td.work b{color:var(--fg);font-weight:600}
 p.note{color:var(--muted);font-size:.82rem;margin-top:1.25rem}
 @media (max-width:42rem){
   thead{display:none}
   tr{display:block;padding:.9rem 0;border-bottom:1px solid var(--line)}
-  td{display:block;border:0;padding:.2rem 0;white-space:normal}
-  td::before{content:attr(data-label);display:block;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  td,td.model,td.work{display:block;border:0;padding:.2rem 0;width:auto;white-space:normal;text-align:left}
+  td+td{margin-top:.5rem}
+  td::before{content:attr(data-label);display:block;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.1rem}
   td.desc{font-size:1rem}
+  td.model .run{font-size:.82rem}
 }
 
 /* ── prompt ──────────────────────────────────────────────── */
@@ -90,43 +93,41 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
         <tr>
           <th>Model</th>
           <th>What they built</th>
-          <th>Run</th>
           <th>Work</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="model" data-label="Model">Space Bunny Free</td>
+          <td class="model" data-label="Model">
+            Space Bunny Free
+            <span class="run"><b>2h 43m 28s</b><br>resumed 1×<br>$0 · free stealth model</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>SPACE BUNNY №1</strong> — four live simulations written from
             scratch with no libraries or build step: a reaction–diffusion system
             that grows Turing patterns, a neural network trained live on your
             drawings, a progressive path tracer, and a fluid solver.
           </td>
-          <td class="run" data-label="Run">
-            <b>2h 43m 28s</b><br>
-            resumed 1×<br>
-            $0 · free stealth model
-          </td>
           <td class="work" data-label="Work"><a href="space-bunny-01-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">DeepSeek V4.1 Flash</td>
+          <td class="model" data-label="Model">
+            DeepSeek V4.1 Flash
+            <span class="run"><b>54m 51s</b><br>no resumes<br>$0.62</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>VOLTA-16</strong> — a complete 16-bit computer that never
             existed: custom instruction set, assembler, firmware ROM, video and
             sound chips, and seven cartridges written in its own assembly, with
             a live editor and CPU debugger in the browser.
           </td>
-          <td class="run" data-label="Run">
-            <b>54m 51s</b><br>
-            no resumes<br>
-            $0.62
-          </td>
           <td class="work" data-label="Work"><a href="deepseek-v4p1-flash-01-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">Muse Spark</td>
+          <td class="model" data-label="Model">
+            Muse Spark
+            <span class="run"><b>11m 37s</b><br>no resumes<br>$0.04</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>PRIMORDIA</strong> — a living planet simulated from scratch
             with no libraries: procedural continents and climate, animals with
@@ -134,15 +135,13 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             a DNA lab, a written chronicle of deep time, and a generative
             soundscape.
           </td>
-          <td class="run" data-label="Run">
-            <b>11m 37s</b><br>
-            no resumes<br>
-            $0.04
-          </td>
           <td class="work" data-label="Work"><a href="muse-spark-1p3-contributor-01-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">GLM 5.3 Flash</td>
+          <td class="model" data-label="Model">
+            GLM 5.3 Flash
+            <span class="run"><b>3h 58m 22s</b><br>resumed 8×<br>$2.81</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>VESPER</strong> — a playable open-world flight adventure:
             pilot a gliding manta across an endless procedural desert at dusk,
@@ -150,15 +149,13 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             beneath a ringed giant. Terrain, sky, water, flocks and the
             generative score are computed live — no assets, no libraries.
           </td>
-          <td class="run" data-label="Run">
-            <b>3h 58m 22s</b><br>
-            resumed 8×<br>
-            $2.81
-          </td>
           <td class="work" data-label="Work"><a href="glm-5p3-flash-01-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">Mimo v2.6 Flash</td>
+          <td class="model" data-label="Model">
+            Mimo v2.6 Flash
+            <span class="run"><b>3h 18m 37s</b><br>no resumes<br>$0.61</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>CONTINUUM CA-7</strong> — a virtual analog computer: nine
             patchable blocks on ±10 V rails, real patch cords, a phosphor
@@ -167,30 +164,26 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             No libraries, no assets; every circuit is checked against an
             independent RK4 solver.
           </td>
-          <td class="run" data-label="Run">
-            <b>3h 18m 37s</b><br>
-            no resumes<br>
-            $0.61
-          </td>
           <td class="work" data-label="Work"><a href="mimo-v2p6-flash-01-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">GPT-6 Luna</td>
+          <td class="model" data-label="Model">
+            GPT-6 Luna
+            <span class="run"><b>12m 50s</b><br>resumed 1×<br>$0.07</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>THE ELSEWHERE ATLAS</strong> — a private mapmaking studio that
             turns a remembered place into an original, shaded topographic world,
             with contour layers, a wandering route, a personal pin, changing
             light, and downloadable shareable charts—all drawn in the browser.
           </td>
-          <td class="run" data-label="Run">
-            <b>12m 50s</b><br>
-            resumed 1×<br>
-            $0.07
-          </td>
           <td class="work" data-label="Work"><a href="gpt-6-luna-02-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">Qwen 3.8 Flash</td>
+          <td class="model" data-label="Model">
+            Qwen 3.8 Flash
+            <span class="run"><b>1h 3m 50s</b><br>no resumes<br>$0.45</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>CANTUS MACHINA</strong> — an endless orchestra that composes
             itself forever, from one seed: movements through related keys, motifs
@@ -199,15 +192,13 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             reads you its own program notes, you can jam with it, and a shared
             link drops a friend into bar 4,000 of the same infinite piece.
           </td>
-          <td class="run" data-label="Run">
-            <b>1h 3m 50s</b><br>
-            no resumes<br>
-            $0.45
-          </td>
           <td class="work" data-label="Work"><a href="qwen-3p8-flash-02-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">LongCat 2.5 Preview (Free)</td>
+          <td class="model" data-label="Model">
+            LongCat 2.5 Preview (Free)
+            <span class="run"><b>28m 45s</b><br>resumed 8×<br>$0 · free preview model</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>LUMEN</strong> — a real-time path tracer running entirely in
             your browser: global illumination, soft shadows, depth of field,
@@ -216,15 +207,13 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             post-processing effects, and one-click PNG export — no libraries,
             no assets, just math.
           </td>
-          <td class="run" data-label="Run">
-            <b>28m 45s</b><br>
-            resumed 8×<br>
-            $0 · free preview model
-          </td>
           <td class="work" data-label="Work"><a href="longcat-2p5-preview-free-02-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">hy4 Preview</td>
+          <td class="model" data-label="Model">
+            hy4 Preview
+            <span class="run"><b>7h 23m</b><br>2 sessions (4h 43m + 2h 40m)<br>resumed 7×<br>$4.31</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>ALETHEIA</strong> — attempted a from-scratch symbolic
             mathematics engine and proof assistant for the browser, with no
@@ -240,16 +229,13 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             seven "continue" prompts — six of them unanswered — before being
             abandoned.
           </td>
-          <td class="run" data-label="Run">
-            <b>7h 23m</b><br>
-            2 sessions (4h 43m + 2h 40m)<br>
-            resumed 7×<br>
-            $4.31
-          </td>
           <td class="work" data-label="Work"><b>FAILED</b><br>no site built</td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">MiniMax-M3</td>
+          <td class="model" data-label="Model">
+            MiniMax-M3
+            <span class="run"><b>1h 29m</b><br>no resumes<br>$2.40</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>PROTOGAIA</strong> — a complete artificial life simulator
             in ~5,000 lines of vanilla JavaScript. A procedurally generated
@@ -266,30 +252,26 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             responds to the ecosystem's population, diversity and time of
             day.
           </td>
-          <td class="run" data-label="Run">
-            <b>1h 29m</b><br>
-            no resumes<br>
-            $2.40
-          </td>
           <td class="work" data-label="Work"><a href="minimax-m3-04-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">GPT-5.6 Luna</td>
+          <td class="model" data-label="Model">
+            GPT-5.6 Luna
+            <span class="run"><b>3m 40s</b><br>no interrupts<br>$0.09</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>LIMINAL FIELD</strong> — a browser-native language-to-light
             instrument: type a sentence, shape its living visual weather with
             pointer physics, choose a mode, hear a pulse, and export a shareable
             field. No model, no server, no external requests.
           </td>
-          <td class="run" data-label="Run">
-            <b>3m 40s</b><br>
-            no interrupts<br>
-            $0.09
-          </td>
           <td class="work" data-label="Work"><a href="gpt-5p6-luna-04-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">Mimo v2.6 Pro</td>
+          <td class="model" data-label="Model">
+            Mimo v2.6 Pro
+            <span class="run"><b>6h 18m</b><br>no resumes / interrupts<br>$0.78</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>ONE BOOK</strong> — a language model that has read exactly one book
             and nothing else: a transformer written from scratch in plain JavaScript,
@@ -301,15 +283,13 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             embedding space, run the verification suite, paste your own text, or press
             Unlearn and watch the words grow back.
           </td>
-          <td class="run" data-label="Run">
-            <b>6h 18m</b><br>
-            no resumes / interrupts<br>
-            $0.78
-          </td>
           <td class="work" data-label="Work"><a href="mimo-v2p6-pro-05-10-2026/">Open site →</a></td>
         </tr>
         <tr>
-          <td class="model" data-label="Model">Claude Haiku 5.5</td>
+          <td class="model" data-label="Model">
+            Claude Haiku 5.5
+            <span class="run"><b>≈1h 15m</b><br>time spent, waits excluded<br>resumed 2× manually<br>$2.40</span>
+          </td>
           <td class="desc" data-label="What they built">
             <strong>THE BLIND PHYSICIST</strong> — an automated scientist that knows no
             physics. It is handed a hidden law of motion (a pendulum, a stiff spring, gravity,
@@ -319,20 +299,15 @@ footer.page{border-top:1px solid var(--line);padding-block:1.5rem 3rem;color:var
             Runs live in the browser, with the search on a worker thread. Checked offline: every
             built-in law rediscovered to within 3% of the truth (18 of 18 test trials).
           </td>
-          <td class="run" data-label="Run">
-            <b>≈1h 15m</b> time spent<br>
-            working time, waits excluded<br>
-            resumed 2× manually<br>
-            $2.40
-          </td>
           <td class="work" data-label="Work"><a href="claude-haiku-5p5-08-10-2026/">Open site →</a></td>
         </tr>
       </tbody>
     </table>
     <p class="note">
-      Run = first prompt to the model's done report. Resumes = times the run
-      had to be told to continue after stopping or erroring. Costs as reported
-      by the OpenCode console.
+      Run details sit under each model name. Time runs from the first prompt to
+      the model's done report; resumes are times the run had to be told to
+      continue after stopping or erroring. Costs as reported by the OpenCode
+      console.
     </p>
   </section>
 
