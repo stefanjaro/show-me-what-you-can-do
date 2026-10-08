@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Blind Physicist</title>
+<meta name="description" content="An automated scientist that knows no physics. It watches a hidden law of motion, chooses its own experiments, and rediscovers the law from noisy measurements, live in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22%2312141b%22/%3E%3Cpath d=%22M6 16 Q16 4 26 16 T26 16%22 fill=%22none%22 stroke=%22%23f4c25b%22 stroke-width=%222.5%22/%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%223%22 fill=%22%235fd3ff%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <a class="back" href="../">← all entries</a>
+  <h1>The Blind <em>Physicist</em></h1>
+  <p class="dek">
+    An automated scientist that knows no physics. It is placed before a hidden law of motion,
+    chooses where to look, and works out the law from nothing but noisy measurements.
+    Watch it hypothesize, test, and converge.
+  </p>
+
+  <div class="chips" id="experiments" role="group" aria-label="Choose an experiment"></div>
+
+  <div class="custom" id="custom-panel">
+    <label class="kicker" for="formula">Type a law of motion · ẍ = f(x, v)</label>
+    <div class="row">
+      <input id="formula" type="text" spellcheck="false" autocomplete="off" aria-label="Acceleration as a function of x and v">
+      <button id="formula-go" class="btn primary" type="button">Let nature run</button>
+    </div>
+    <div class="examples" id="formula-examples"></div>
+    <p class="err" id="formula-msg" role="status"></p>
+  </div>
+</header>
+
+<main>
+
+<section class="stage">
+  <figure class="panel nature">
+    <figcaption class="kicker">Nature · the experiment in progress</figcaption>
+    <canvas id="nature" aria-label="The physical system being measured"></canvas>
+  </figure>
+
+  <figure class="panel mind">
+    <figcaption class="kicker">The machine · what it sees, believes, and wants to test next</figcaption>
+    <div id="mind-2d" class="maps">
+      <div><canvas id="map-nature"></canvas><span>Nature</span></div>
+      <div><canvas id="map-belief"></canvas><span>Belief · its best law</span></div>
+      <div><canvas id="map-disagree"></canvas><span>Disagreement · where it looks next</span></div>
+    </div>
+    <span class="legend">Colour is the acceleration over the space of states (position and velocity, or angle and angular speed). Dots are measurements. The gold path is the experiment under way. Bright cyan marks where its best laws part ways, and that is where it looks next.</span>
+    <div id="mind-1d" hidden>
+      <canvas id="curve" aria-label="Measurements and the machine's laws"></canvas>
+      <span class="legend">dots: measurements · cyan: belief (and rival laws) · gold dashed: truth, once revealed · vertical gold line: next experiment</span>
+    </div>
+  </figure>
+</section>
+
+<section class="controls" aria-label="Controls">
+  <button id="btn-play" class="btn" type="button">Pause</button>
+  <button id="btn-restart" class="btn" type="button">Start over</button>
+  <span class="label">speed</span>
+  <div class="seg" role="group" aria-label="Simulation speed">
+    <button type="button" data-speed="1">1×</button>
+    <button type="button" data-speed="3">3×</button>
+    <button type="button" data-speed="10">10×</button>
+  </div>
+  <span class="label">instrument noise</span>
+  <div class="seg" role="group" aria-label="Measurement noise">
+    <button type="button" data-noise="0">0%</button>
+    <button type="button" data-noise="0.01">1%</button>
+    <button type="button" data-noise="0.03">3%</button>
+  </div>
+  <button id="btn-reveal" class="btn" type="button">Reveal truth</button>
+</section>
+
+<section class="readout">
+  <div class="panel law" id="law">
+    <p class="kicker">The law, as the machine currently states it</p>
+    <p class="formula"><span id="law-target">–</span> <span id="law-expr">no law yet</span></p>
+    <p class="meta" id="law-meta"></p>
+    <p class="note" id="law-note"></p>
+    <p class="truth" id="law-truth"></p>
+    <span class="stamp" id="law-stamp" hidden>Law found</span>
+  </div>
+
+  <div class="panel">
+    <p class="kicker">Simplicity against accuracy · error as a share of a typical reading · best law at each size</p>
+    <canvas id="pareto" aria-label="Pareto front of candidate laws"></canvas>
+  </div>
+</section>
+
+<section class="panel notebook-wrap">
+  <p class="kicker">Notebook</p>
+  <div class="notebook" id="notebook" aria-live="polite"></div>
+  <div class="stats">
+    <span><b id="stat-exp">0</b> experiments</span>
+    <span><b id="stat-meas">0</b> measurements</span>
+    <span><b id="stat-gens">0</b> generations of search</span>
+    <span><b id="stat-evals">0</b> candidate laws scored</span>
+    <span>search on <b id="stat-mode">-</b></span>
+  </div>
+</section>
+
+<section class="method">
+  <p class="kicker">How it works</p>
+  <ol>
+    <li><b>Nature</b> integrates a hidden law of motion with a fourth-order Runge–Kutta solver. The machine only ever receives noisy readings of the acceleration.</li>
+    <li><b>Search</b> evolves candidate expressions by genetic programming: crossover, mutation, and a parsimony pressure that prefers short laws. Every constant is fitted by Levenberg–Marquardt least squares, so the search only has to find the shape of a law.</li>
+    <li><b>Judgement</b> keeps the best law at each complexity. The simplest law that explains the readings as well as the best one is the law it states, and it is only declared found when its error is consistent with the instrument noise.</li>
+    <li><b>Curiosity</b> sends the machine to the place where its best laws disagree most. Experiments are chosen by the machine, not by a script.</li>
+  </ol>
+  <p>
+    Checks, run offline in Node: <code>node tests/verify.js discover</code> rediscovers every built-in law from scratch,
+    scored against the noiseless truth over the whole domain, and verifies the physics (energy and angular momentum conservation, exact Kepler periods)
+    and the expression engine (the compiled evaluator and the display rewrite both agree with the reference interpreter).
+  </p>
+  <p>Built by Claude Haiku 5.5 for <em>Show Me What You Can Do</em>. Plain HTML, CSS and JavaScript, no libraries, no build step.</p>
+</section>
+
+</main>
+
+<footer>
+  The Blind Physicist · <a href="../">all entries</a> · <a href="https://github.com/stefanjaro/show-me-what-you-can-do">repository ↗</a>
+</footer>
+
+</div>
+
+<script src="js/expr.js"></script>
+<script src="js/gp.js"></script>
+<script src="js/worlds.js"></script>
+<script src="js/scientist.js"></script>
+<script src="js/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
