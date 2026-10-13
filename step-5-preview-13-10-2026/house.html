@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>The Impossible House — walk in</title>
+<meta name="theme-color" content="#07070a">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<canvas id="view"></canvas>
+
+<div class="house-ui">
+  <div id="crosshair"></div>
+  <div id="msg"></div>
+  <div id="prompt"></div>
+  <div class="readout">
+    <div class="left">
+      <span id="room">THE ATRIUM</span>
+      <span class="dim"><span id="compass">N</span> · <span id="elev">1.6 m</span> · <span id="fps">—</span></span>
+    </div>
+    <div class="right">
+      <span id="inverted">inverted</span>
+      <span id="seals">0 / 4 seals</span>
+      <span class="dim">M — atlas</span>
+    </div>
+  </div>
+
+  <div class="panel" id="note">
+    <div class="card">
+      <span class="num">A NOTE LEFT IN THE HOUSE</span>
+      <h3 data-title></h3>
+      <p data-text></p>
+      <button class="close" data-close>Continue walking</button>
+    </div>
+  </div>
+
+  <div class="panel" id="atlas">
+    <div class="card">
+      <span class="num">THE ATLAS</span>
+      <h3>Where you have been</h3>
+      <div class="atlas-list" data-list></div>
+      <p class="hint">M closes this. Click a room to travel there.</p>
+    </div>
+  </div>
+</div>
+
+<div class="curtain" id="curtain">
+  <span class="kicker" style="font-size:.7rem;letter-spacing:.42em;text-transform:uppercase;color:var(--gilt)">The Impossible House</span>
+  <h2>Walk into a building that <em>cannot exist</em>.</h2>
+  <p>
+    Four seals are hidden in four wings of the house. Each wing breaks
+    geometry in a different way. Nothing here is a trick of the camera — the
+    walls are solid, and the doorways are the only liars.
+  </p>
+  <div class="keys">
+    <span><b>W A S D</b> walk</span>
+    <span><b>Mouse</b> look</span>
+    <span><b>Shift</b> hurry</span>
+    <span><b>E</b> read / take</span>
+    <span><b>M</b> atlas</span>
+  </div>
+  <button id="begin">Step inside</button>
+  <p class="hint" style="font-size:.72rem">Sound is synthesised live; it starts when you do.</p>
+</div>
+
+<script src="js/core/noise.js"></script>
+<script src="js/core/mathx.js"></script>
+<script src="js/core/textures.js"></script>
+<script src="js/core/render.js"></script>
+<script src="js/core/audio.js"></script>
+<script src="js/world/geom.js"></script>
+<script src="js/world/house.js"></script>
+<script src="js/game/game.js"></script>
+<script>
+(function () {
+  const G = IH.game.create({
+    canvas: document.getElementById('view'),
+    ui: {
+      room: document.getElementById('room'),
+      seals: document.getElementById('seals'),
+      elev: document.getElementById('elev'),
+      compass: document.getElementById('compass'),
+      inverted: document.getElementById('inverted'),
+      msg: document.getElementById('msg'),
+      prompt: document.getElementById('prompt'),
+      fps: document.getElementById('fps'),
+      note: document.getElementById('note'),
+      atlas: document.getElementById('atlas'),
+      crosshair: document.getElementById('crosshair'),
+    },
+  });
+  const audio = IH.audio.create();
+  G.audio = audio;
+  G.readNotes = {};
+  G.sealIds = [];
+
+  document.querySelectorAll('[data-close]').forEach((b) => b.onclick = () => {
+    document.getElementById('note').classList.remove('show');
+    document.getElementById('atlas').classList.remove('show');
+    G.atlasOpen = false;
+  });
+
+  const curtain = document.getElementById('curtain');
+  document.getElementById('begin').onclick = function () {
+    curtain.classList.add('gone');
+    setTimeout(() => curtain.remove(), 1000);
+    IH.game.start(G, audio);
+    G.say('Four seals. Four wings. The house is waiting.');
+  };
+  /* allow the enter key too */
+  addEventListener('keydown', function (e) {
+    const b = document.getElementById('begin');
+    if (e.key === 'Enter' && b) b.onclick();
+  });
+})();
+</script>
+</body>
+</html>

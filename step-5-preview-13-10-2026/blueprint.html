@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The blueprint — The Impossible House</title>
+<meta name="description" content="How a building that cannot exist is built: portal rendering, the algebra of doorways, procedural textures and 82 headless checks.">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<header class="bar">
+  <div><b>The blueprint</b> &nbsp;<span>how a non-Euclidean building is built</span></div>
+  <nav>
+    <a href="index.html">Front page</a>
+    <a href="house.html">Enter the house</a>
+  </nav>
+</header>
+
+<article class="doc">
+  <span class="tag">Engineering notes</span>
+  <h1>The blueprint</h1>
+  <p class="lead">
+    The house is 52 rooms, 1,673 polygons, 53 doorways and about 4,000 lines
+    of plain JavaScript. There is no engine, no WebGL, no build step, no image
+    file and no audio file. This page is about how the impossible parts work.
+  </p>
+
+  <h2>1 · The problem</h2>
+  <p>
+    A building whose corridors loop with a quarter turn, whose staircase
+    ascends forever, whose rooms shrink without end and whose doorways stand
+    you on the ceiling cannot be built from boxes. But it <em>can</em> be built
+    out of boxes if you are willing to lie about which box you are in.
+  </p>
+  <p>
+    So the house is a graph of rooms. Each room is a convex brush. Each
+    doorway is a window in one of its six faces, and each window is glued to
+    a window in another room. The gluing is the only place where geometry is
+    allowed to be dishonest; everything else — walls, floors, ceilings,
+    collision, light — is ordinary Euclid.
+  </p>
+
+  <h2>2 · The renderer</h2>
+  <p>
+    Rooms are convex, so the classic portal approach works. The camera sits in
+    a room; the room's polygons are clipped to the camera's view volume and
+    rasterised; and for every doorway the camera is transformed through it and
+    the room beyond is drawn, clipped to the cone of directions that can be
+    seen through that doorway. Recurse until the depth budget runs out.
+  </p>
+<pre>function renderSector(r, depth) {
+  for (const poly of sector.polys) {
+    const n = clipPoly(poly.pts, 4, r._planes, r._out, r._planes.length);
+    if (n >= 3) drawPoly(r, poly, r._out, n);
+  }
+  if (depth >= MAXDEPTH) return;
+  for (const gate of sector.gates) {
+    if (!gate.active) continue;
+    // the camera must be inside this room, looking out through the door
+    if (dot(gate.n, cam.p - gate.center) >= 0) continue;
+    if (dot(gate.n, cam.f) <= 0) continue;
+    const child = poseApply(gate.xf, cam);          // through the looking glass
+    const planes = frustumPlanes(child);            // its own view volume …
+    conePlanes(child.p, gate.targetQuad, planes);   // … narrowed to the doorway
+    renderSector({ sector: gate.target, planes }, depth + 1);
+  }
+}</pre>
+  <p>
+    Because a z-buffer does the occlusion, draw order is irrelevant; the portal
+    cones are there to stop the renderer doing work it would throw away, not
+    to keep the picture correct. A screen-space convex clip polygon per level
+    would be the other way to do it — but it breaks the moment a doorway
+    turns, and every doorway in this house turns.
+  </p>
+
+  <h3>Rasterising a polygon</h3>
+  <p>
+    Each polygon is clipped in world space, projected, then filled by walking
+    its edges: for every scanline the edge intersections give the left and
+    right end of the span and the value of every attribute at both ends, and
+    the span is filled by linear interpolation. Per-pixel depth is
+    <code>1/z</code>, so texture coordinates are perspective-correct for the
+    price of three divides per pixel — <code>u = (u/z)·z</code>.
+  </p>
+<pre>for (let y = y0; y <= y1; y++) {
+  const xls = XL[y], xrs = XR[y];
+  let iz = ZL[y] + (ZR[y] - ZL[y]) * ((xa + 0.5 - xls) * invSpan);
+  ...
+  for (let x = xa; x <= xb; x++, idx++) {
+    if (iz <= zbuf[idx]) continue;                 // occluded
+    zbuf[idx] = iz;
+    const c = tex[(((wz * depth) & mask) << shift) | ((uz * depth) & mask)];
+    out[idx] = 0xff000000 | (cb << 16) | (cg << 8) | cr;
+    iz += diz; ...                                 // step the gradients
+  }
+}</pre>
+  <p>
+    Lighting is per-vertex and coloured: every vertex is evaluated against
+    the room's point lights with a wrapped diffuse term, then interpolated
+    across the polygon and multiplied into the texel together with distance
+    fog. Wrapping the diffuse — <code>(n·l + 1)/2, squared</code> — is what
+    keeps a large flat wall from going dead black where it turns away from a
+    torch, and it is also what makes the floor of a room read as a floor
+    rather than a hole.
+  </p>
+  <p>
+    The whole thing draws into a <code>Uint32Array</code> that is the backing
+    store of an <code>ImageData</code>, so a frame is one <code>putImageData</code>
+    and a CSS upscale. The renderer measures its own frame time and trades
+    resolution for smoothness, settling wherever your machine likes.
+  </p>
+
+  <figure>
+    <canvas id="shot-atrium" width="480" height="270"></canvas>
+    <figcaption>Rendered live in your browser by the same engine that runs the
+    house: the atrium, four columns, and the doorway to the gallery — through
+    which the renderer is already recursing.</figcaption>
+  </figure>
+
+  <h2>3 · The algebra of doorways</h2>
+  <p>
+    A doorway is a rectangle. A rectangle with an origin, a width axis, a
+    height axis and an outward normal is a frame, and a frame is a rigid
+    transform. Two frames and a rule for gluing them give you a doorway
+    between any two rooms, anywhere, in any orientation.
+  </p>
+  <p>
+    The rule has to satisfy one physical demand: for two doors that lie back
+    to back on the same wall — an ordinary doorway between two rooms — the
+    gluing has to be the identity, because you can walk through it and nothing
+    about you changes. That fixes everything else.
+  </p>
+<pre>/* R = [ -u_B | v_B | -n_B ] · [ u_A | v_A | n_A ]ᵀ ,  t = c_B - R · c_A */</pre>
+  <p>
+    The minus sign on <code>u<sub>B</sub></code> is the whole trick. The two
+    doors are wound with opposite handedness because they face opposite ways,
+    so preserving orientation demands that one in-plane axis be flipped; the
+    normal has to flip too, because walking <em>out of</em> A has to become
+    walking <em>into</em> B. Do it the other way and you get a mirror world,
+    which is a different and stranger house.
+  </p>
+  <p>
+    On top of the gluing, a doorway can carry a twist — a rotation about the
+    far door's own frame. Half a turn about its width axis stands the visitor
+    on the ceiling without turning them round, which is how the Inverted
+    Chapel is built. A quarter turn about its height axis is how the Hall of
+    Turning gets its holonomy.
+  </p>
+
+  <figure>
+    <canvas id="shot-invert" width="480" height="270"></canvas>
+    <figcaption>The Inverted Chapel, from the moment of arrival: the floor is
+    above you, the pews hang below, and the doorway you came through is in the
+    vault behind you.</figcaption>
+  </figure>
+
+  <h2>4 · A staircase that ascends forever</h2>
+  <p>
+    Twelve steps to a flight, four flights to a circuit. Each step is a box;
+    each flight turns a corner onto the next; and the last flight of every
+    circuit opens onto the first step of the next circuit, which is one
+    landing higher because it <em>is</em> one landing higher — a different
+    box, twelve steps further up the world. Walk the circuit and the elevation
+    readout jumps by exactly the height of a circuit, which is the only
+    honest way to describe what should not be happening.
+  </p>
+
+  <figure>
+    <canvas id="shot-stairs" width="480" height="270"></canvas>
+    <figcaption>The ascent: iron railings, basalt, a torch every landing, and
+    at the top of the flight a doorway that leads back to the bottom.</figcaption>
+  </figure>
+
+  <h2>5 · Every surface is a function</h2>
+  <p>
+    There are no image files. Stone is four courses of blocks with mortar
+    between them and a little relief from the height derivative of the noise
+    underneath. Marble is domain-warped ridged noise. Oak is ridged noise
+    along the grain with Worley knots. Tile is a Greek key. Gilt is noisy
+    gold leaf. The void is warped fBm.
+  </p>
+  <figure>
+    <canvas id="tex-sheet" width="768" height="512"></canvas>
+    <figcaption>Generated live, at 128×128, in this page: value noise, fBm,
+    ridged multifractals, Worley cells and domain warping — about 120 lines
+    of noise and 15 recipes.</figcaption>
+  </figure>
+
+  <h2>6 · Knowing that it works</h2>
+  <p>
+    The engine, the world and the visitor are all plain JavaScript with no
+    dependencies on a browser, so they can be run backwards: a headless suite
+    loads the same files in Node and exercises them end to end — 82 checks,
+    all passing. Notably it walks a real visitor through every impossibility
+    and checks what happened to them.
+  </p>
+  <table>
+    <thead><tr><th>Check</th><th>What it proves</th></tr></thead>
+    <tbody>
+      <tr><td>Clipper</td><td>Sutherland–Hodgman against seven planes leaves a 4×4 square with area exactly 16, and a fully outside polygon disappears.</td></tr>
+      <tr><td>Frustum</td><td>Six planes classify inside/outside correctly for a camera that has been rolled a quarter turn.</td></tr>
+      <tr><td>Gluing</td><td>Two doors back to back give exactly the identity; a quarter turn rotates the heading; half a turn each way turns you upside down without turning you round.</td></tr>
+      <tr><td>Rigidity</td><td>Every one of the 53 portal transforms is a proper rotation with determinant 1 and an orthonormal basis — no mirrors, no shear, no scale drift.</td></tr>
+      <tr><td>Linkage</td><td>Every doorway id occurs exactly twice, each end carries its twin's centre, and every room in the house is reachable from the atrium.</td></tr>
+      <tr><td>Holonomy</td><td>A visitor walked through all four doors of the ring arrives back in the room they left, facing a quarter turn off.</td></tr>
+      <tr><td>Recessional</td><td>A visitor descends seven rooms whose widths are 7.2 → 5.8 → 4.6 → 3.7 → 2.9 → 2.4 → 1.9 metres.</td></tr>
+      <tr><td>Penrose</td><td>A visitor climbing the ascent rises continuously, crosses from one circuit to the next, and is still inside a real room when they stop.</td></tr>
+      <tr><td>Inversion</td><td>A visitor who walks through the chapel door is left with their head pointing down, inside the room, on the ceiling.</td></tr>
+      <tr><td>Renderer</td><td>The atrium frame draws geometry, looks through doorways, terminates inside its depth budget, and writes the depth buffer.</td></tr>
+      <tr><td>Visitor</td><td>Fifteen hundred frames of random wandering never leaves the room the visitor is in.</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    The suite is part of the repository: <code>dev/tests.js</code> for the engine
+    and the world, <code>dev/game-smoke.js</code> for the game layer,
+    <code>dev/page-smoke.js</code> for the front page, and
+    <code>dev/preview.js</code>, which renders any view of the house as ASCII so
+    the geometry can be checked without a browser at all.
+  </p>
+
+  <div class="foot">
+    <span><a href="index.html">← Front page</a> &nbsp;·&nbsp; <a href="house.html">Enter the house →</a></span>
+    <span>52 rooms · 1,673 polygons · 53 doorways · 82 checks</span>
+  </div>
+</article>
+
+<script src="js/core/noise.js"></script>
+<script src="js/core/mathx.js"></script>
+<script src="js/core/textures.js"></script>
+<script src="js/core/render.js"></script>
+<script src="js/world/geom.js"></script>
+<script src="js/world/house.js"></script>
+<script src="js/page/blueprint.js"></script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE IMPOSSIBLE HOUSE — style
+   A house with a house style: gilt on near-black, a serif for the plaques,
+   thin rules, and a lot of dark.
+   ═════════════════════════════════════════════════════════════════════════ */
+:root {
+  --ink: #07070a;
+  --ink2: #0d0e12;
+  --panel: rgba(14, 14, 18, 0.82);
+  --parch: #efe6d6;
+  --parch-dim: #b3aa9c50;
+  --muted: #9a927f;
+  --gilt: #d8b26a;
+  --gilt-dim: #8e7440;
+  --line: #ffffff16;
+  --seal: #c2453a;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--parch);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: var(--gilt); text-decoration: none; }
+a:hover { color: #f0d49a; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: 0.01em; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2.4rem 0; }
+
+/* ── the film over everything ─────────────────────────────────────────── */
+.grain, .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 40; }
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
+  mix-blend-mode: multiply;
+}
+.grain {
+  opacity: 0.05;
+  background-image: repeating-radial-gradient(circle at 17% 32%, #fff 0 0.5px, transparent 1px 100%),
+    repeating-radial-gradient(circle at 73% 61%, #fff 0 0.5px, transparent 1px 100%);
+  background-size: 7px 7px, 11px 11px;
+  animation: grain 0.9s steps(3) infinite;
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  33% { transform: translate(-1px, 1px); }
+  66% { transform: translate(1px, -1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ── top bar ──────────────────────────────────────────────────────────── */
+.bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem clamp(1rem, 4vw, 2.6rem);
+  background: linear-gradient(#07070ac0, #07070a00);
+  font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+}
+.bar b { font-weight: 600; color: var(--parch); }
+.bar span { color: var(--muted); }
+.bar nav { display: flex; gap: 1.4rem; }
+
+/* ── the landing ──────────────────────────────────────────────────────── */
+#stage { position: fixed; inset: 0; z-index: 0; }
+#stage canvas { width: 100%; height: 100%; display: block; }
+.cover {
+  position: relative; z-index: 10;
+  min-height: 100vh; min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 clamp(1.2rem, 6vw, 6rem) clamp(2.5rem, 8vh, 5rem);
+}
+.cover .kicker, .cover h1, .cover .lede, .cover .enter, .cover .meta {
+  animation: rise 1.6s cubic-bezier(.16,.8,.3,1) backwards;
+}
+.cover h1 { animation-delay: .12s; }
+.cover .lede { animation-delay: .28s; }
+.cover .enter { animation-delay: .42s; }
+.cover .meta { animation-delay: .6s; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(1.2rem); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.cover .kicker {
+  font-size: 0.7rem; letter-spacing: 0.42em; text-transform: uppercase;
+  color: var(--gilt); margin: 0 0 1.4rem;
+}
+.cover h1 {
+  font-size: clamp(2.6rem, 9vw, 7.4rem);
+  line-height: 0.92; margin: 0 0 1.6rem; max-width: 15ch;
+  text-shadow: 0 0.2rem 2.4rem #000a;
+}
+.cover h1 em { font-style: italic; color: var(--gilt); }
+.cover .lede {
+  max-width: 46ch; color: #d8cfbe; font-size: clamp(1rem, 1.5vw, 1.15rem);
+  text-shadow: 0 0.1rem 1.2rem #000c;
+}
+.cover .lede strong { color: var(--parch); font-weight: 600; }
+.enter {
+  display: inline-flex; align-items: center; gap: 0.9rem;
+  margin-top: 2.4rem; padding: 1.05rem 2.1rem;
+  border: 1px solid var(--gilt-dim); border-radius: 2px;
+  background: #0b0b0ed0; color: var(--parch);
+  font-family: var(--serif); font-size: 1.06rem; letter-spacing: 0.06em;
+  cursor: pointer; transition: 0.25s; align-self: flex-start;
+  backdrop-filter: blur(3px);
+}
+.enter:hover { background: var(--gilt); color: #100c05; border-color: var(--gilt); }
+.enter svg { width: 1.1rem; height: 1.1rem; }
+.cover .meta {
+  position: absolute; right: clamp(1.2rem, 6vw, 6rem); bottom: clamp(2.5rem, 8vh, 5rem);
+  text-align: right; font-size: 0.72rem; color: var(--muted);
+  line-height: 1.9; letter-spacing: 0.08em;
+}
+
+/* ── the four impossibilities ─────────────────────────────────────────── */
+.sheet {
+  position: relative; z-index: 10;
+  background: linear-gradient(#07070a00, #07070a 12%, #07070a);
+  padding: clamp(3rem, 12vh, 9rem) clamp(1.2rem, 6vw, 6rem);
+}
+.sheet h2 {
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem); margin: 0 0 0.6rem;
+}
+.sheet .sub { color: var(--muted); max-width: 60ch; margin: 0 0 3.2rem; }
+.four { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: var(--line); }
+.four article {
+  background: var(--ink2); padding: 1.8rem 1.6rem 2rem;
+  display: flex; flex-direction: column; gap: 0.55rem;
+}
+.four .num { font-family: var(--mono); font-size: 0.68rem; color: var(--gilt-dim); letter-spacing: 0.2em; }
+.four h3 { font-size: 1.22rem; margin: 0.2rem 0 0; }
+.four p { color: #bdb4a4; font-size: 0.92rem; margin: 0; }
+.four article:hover { background: #12131a; }
+.four article:hover h3 { color: var(--gilt); }
+
+/* ── the machines behind it ───────────────────────────────────────────── */
+.blueprint {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2.4rem 3rem; margin-top: 1rem;
+}
+.blueprint section h3 {
+  font-size: 0.74rem; letter-spacing: 0.22em; text-transform: uppercase;
+  font-family: var(--sans); color: var(--gilt); margin: 0 0 0.9rem;
+  padding-bottom: 0.6rem; border-bottom: 1px solid var(--line);
+}
+.blueprint ul { margin: 0; padding: 0; list-style: none; }
+.blueprint li {
+  font-size: 0.9rem; color: #b9b0a1; padding: 0.35rem 0 0.35rem 1.1rem;
+  position: relative;
+}
+.blueprint li::before { content: "—"; position: absolute; left: 0; color: var(--gilt-dim); }
+.blueprint li b { color: var(--parch); font-weight: 600; }
+
+/* ── footer ────────────────────────────────────────────────────────────── */
+.foot {
+  border-top: 1px solid var(--line); margin-top: 4rem; padding-top: 1.6rem;
+  display: flex; justify-content: space-between; gap: 2rem; flex-wrap: wrap;
+  font-size: 0.78rem; color: var(--muted);
+}
+
+/* ═══════════════════════════ the house itself ═════════════════════════ */
+#view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; background: #07070a; }
+.house-ui { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
+
+#crosshair {
+  position: absolute; left: 50%; top: 50%; width: 16px; height: 16px;
+  margin: -8px 0 0 -8px; opacity: 0.35; transition: opacity 0.3s;
+}
+#crosshair::before, #crosshair::after {
+  content: ""; position: absolute; background: #efe6d6;
+}
+#crosshair::before { left: 7px; top: 0; width: 2px; height: 16px; }
+#crosshair::after { top: 7px; left: 0; height: 2px; width: 16px; }
+
+.readout {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: clamp(1rem, 3vw, 2.2rem);
+  font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+  text-shadow: 0 1px 8px #000;
+}
+.readout .left { display: flex; flex-direction: column; gap: 0.3rem; }
+.readout #room { font-family: var(--serif); font-size: 1.02rem; letter-spacing: 0.1em; color: var(--parch); text-transform: none; }
+.readout .dim { color: #ffffff88; }
+.readout .right { text-align: right; display: flex; flex-direction: column; gap: 0.3rem; align-items: flex-end; }
+.readout #seals { color: var(--gilt); font-family: var(--serif); font-size: 1rem; letter-spacing: 0.14em; }
+.readout #inverted { color: var(--seal); opacity: 0; transition: opacity 0.4s; font-family: var(--serif); letter-spacing: 0.2em; }
+#prompt {
+  position: absolute; left: 50%; top: calc(50% + 26px); transform: translateX(-50%);
+  font-size: 0.76rem; letter-spacing: 0.2em; text-transform: uppercase; color: #000;
+  background: #efe6d6cc; padding: 0.3rem 0.8rem; opacity: 0; transition: opacity 0.2s;
+  pointer-events: none;
+}
+#msg {
+  position: absolute; left: 50%; top: 22%; transform: translateX(-50%);
+  font-family: var(--serif); font-size: clamp(1rem, 2.4vw, 1.5rem); color: var(--parch);
+  text-shadow: 0 2px 18px #000; opacity: 0; transition: opacity 0.6s; text-align: center;
+  max-width: 80vw;
+}
+
+/* panels: notes and the atlas */
+.panel {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: #05050890; opacity: 0; pointer-events: none; transition: opacity 0.35s;
+  padding: 1.2rem; backdrop-filter: blur(4px);
+}
+.panel.show { opacity: 1; pointer-events: auto; }
+.panel .card {
+  max-width: 44rem; width: 100%; background: var(--panel);
+  border: 1px solid var(--gilt-dim); padding: clamp(1.6rem, 4vw, 2.8rem);
+  box-shadow: 0 2rem 6rem #000c;
+}
+.panel .card .num { font-family: var(--mono); font-size: 0.7rem; color: var(--gilt-dim); letter-spacing: 0.3em; }
+.panel h3 { font-size: clamp(1.4rem, 3vw, 2.1rem); margin: 0.6rem 0 1.2rem; color: var(--parch); }
+.panel p { color: #cfc6b7; font-size: 1.02rem; margin: 0 0 1.6rem; }
+.panel .close { font-size: 0.74rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gilt); background: none; border: 0; cursor: pointer; }
+.atlas-list { display: grid; gap: 1px; background: var(--line); margin-bottom: 1.6rem; }
+.atlas-list button {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+  background: #0e0f13; border: 0; color: var(--parch); padding: 0.95rem 1.1rem;
+  font-family: var(--serif); font-size: 1.06rem; cursor: pointer; text-align: left;
+}
+.atlas-list button:hover:not([disabled]) { background: #191a21; color: var(--gilt); }
+.atlas-list button[disabled] { color: #6a6559; cursor: default; }
+.atlas-list button em { font-style: normal; font-family: var(--sans); font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.hint { font-size: 0.74rem; color: var(--muted); letter-spacing: 0.1em; }
+
+/* the intro curtain */
+.curtain {
+  position: fixed; inset: 0; z-index: 60; background: #050507;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1.8rem; text-align: center; padding: 2rem; transition: opacity 0.9s;
+}
+.curtain.gone { opacity: 0; pointer-events: none; }
+.curtain h2 { font-size: clamp(1.8rem, 6vw, 3.4rem); margin: 0; }
+.curtain h2 em { font-style: italic; color: var(--gilt); }
+.curtain p { color: var(--muted); max-width: 52ch; margin: 0; }
+.curtain .keys { display: flex; gap: 1.6rem; flex-wrap: wrap; justify-content: center; font-size: 0.76rem; color: #9a927f; letter-spacing: 0.14em; text-transform: uppercase; }
+.curtain .keys b { color: var(--parch); font-weight: 600; }
+.curtain button {
+  margin-top: 0.6rem; padding: 0.95rem 2.4rem; border: 1px solid var(--gilt-dim);
+  background: #0b0b0e; color: var(--parch); font-family: var(--serif); font-size: 1.1rem;
+  letter-spacing: 0.06em; cursor: pointer; transition: 0.25s;
+}
+.curtain button:hover { background: var(--gilt); color: #100c05; }
+
+/* the blueprint page */
+.doc { position: relative; z-index: 10; max-width: 62rem; margin: 0 auto; padding: clamp(4rem, 12vh, 8rem) clamp(1.2rem, 5vw, 3rem) 4rem; }
+.doc h1 { font-size: clamp(2rem, 6vw, 3.6rem); margin: 0 0 1rem; }
+.doc h2 { font-size: clamp(1.3rem, 3vw, 1.9rem); margin: 3.4rem 0 1rem; color: var(--parch); }
+.doc h3 { font-size: 1.02rem; margin: 2rem 0 0.6rem; color: var(--gilt); font-family: var(--sans); letter-spacing: 0.06em; }
+.doc p, .doc li { color: #c3bbac; }
+.doc .lead { font-size: 1.14rem; color: #d6cebe; max-width: 60ch; }
+.doc pre {
+  background: #0b0c10; border: 1px solid var(--line); padding: 1.1rem 1.3rem;
+  overflow-x: auto; font-family: var(--mono); font-size: 0.84rem; line-height: 1.7;
+  color: #cfc6b7; border-radius: 2px;
+}
+.doc code { font-family: var(--mono); font-size: 0.9em; color: var(--gilt); }
+.doc table { width: 100%; border-collapse: collapse; margin: 1.4rem 0; font-size: 0.9rem; }
+.doc th, .doc td { text-align: left; padding: 0.6rem 0.8rem 0.6rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.doc th { color: var(--gilt); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; font-family: var(--sans); }
+.doc figure { margin: 2rem 0; }
+.doc figcaption { font-size: 0.78rem; color: var(--muted); margin-top: 0.6rem; }
+.doc canvas { width: 100%; height: auto; display: block; border: 1px solid var(--line); background: #05050a; image-rendering: pixelated; }
+.doc .tag { display: inline-block; font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gilt); border: 1px solid var(--gilt-dim); padding: 0.25rem 0.7rem; margin-bottom: 1.4rem; }
+
+@media (max-width: 640px) {
+  .cover .meta { display: none; }
+  .readout { font-size: 0.66rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+}

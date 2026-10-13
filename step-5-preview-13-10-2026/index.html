@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Impossible House — a museum of non-Euclidean architecture</title>
+<meta name="description" content="A playable museum of impossible architecture, rendered by a 3D engine written from scratch in plain JavaScript. Walk through doorways that turn you upside down, down a corridor of shrinking rooms, and up stairs that ascend forever.">
+<meta name="theme-color" content="#07070a">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<header class="bar">
+  <div><b>The Impossible House</b> &nbsp;<span>a museum of non-Euclidean architecture</span></div>
+  <nav>
+    <a href="house.html">Enter the house</a>
+    <a href="blueprint.html">The blueprint</a>
+    <a href="https://github.com/stefanjaro/show-me-what-you-can-do">Repository ↗</a>
+  </nav>
+</header>
+
+<!-- the background is the real engine, running the real house -->
+<div id="stage"><canvas id="landing-canvas"></canvas></div>
+
+<section class="cover">
+  <p class="kicker">Built from scratch · no engine · no libraries · no assets</p>
+  <h1>The house that is <em>not a house</em>.</h1>
+  <p class="lede">
+    Behind this page a 3D renderer written in plain JavaScript is drawing a
+    building that cannot exist. Every wall, every texture, every shadow comes
+    out of arithmetic — there is nothing here but code.
+    <strong>Walk into it.</strong>
+  </p>
+  <button class="enter" id="enter">
+    Enter the house
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+  </button>
+  <div class="meta">
+    four seals · five wings<br>
+    a quarter turn, forever<br>
+    <span id="fps">—</span>
+  </div>
+</section>
+
+<section class="sheet">
+  <h2>Four ways to break a building.</h2>
+  <p class="sub">
+    Each wing of the house breaks geometry in a different way. None of them
+    use a trick: the walls are solid, the rooms are real, and the doorways
+    are the only thing that is lying to you.
+  </p>
+  <div class="four">
+    <article>
+      <span class="num">WING I</span>
+      <h3>The Hall of Turning</h3>
+      <p>Four rooms in a ring, three ordinary doors and one twisted a quarter
+      turn. Walk the loop and come back facing the wrong way. The ring carries
+      holonomy — a property of curved space, built out of flat ones.</p>
+    </article>
+    <article>
+      <span class="num">WING II</span>
+      <h3>The Penrose Ascent</h3>
+      <p>Twelve steps to a flight, four flights to a circuit, and the top of
+      every circuit is the bottom of the next — one landing higher than the
+      last time you stood there. Climb as long as you like.</p>
+    </article>
+    <article>
+      <span class="num">WING III</span>
+      <h3>The Recessional</h3>
+      <p>Seven rooms, each four fifths of the last, each turned a quarter.
+      The far wall is always the same distance away. The eye never reaches
+      the end, and neither does the renderer, which recurses until it runs
+      out of depth.</p>
+    </article>
+    <article>
+      <span class="num">WING IV</span>
+      <h3>The Inverted Chapel</h3>
+      <p>A doorway cut high in the vault, hinged about nothing. Step through
+      and the floor goes away: you stand on the ceiling, the pews hang below
+      you, and the seal is out of reach unless you are.</p>
+    </article>
+  </div>
+
+  <hr>
+
+  <h2>Everything here is arithmetic.</h2>
+  <p class="sub">
+    No engine, no WebGL, no image files, no models, no audio files. What
+    follows is what the page is actually doing.
+  </p>
+  <div class="blueprint">
+    <section>
+      <h3>The renderer</h3>
+      <ul>
+        <li><b>Portal culling.</b> Rooms are convex. A doorway is a window into the next room; the renderer walks the graph of rooms, clipping each view to the cone it can see through.</li>
+        <li><b>Z-buffered rasteriser.</b> Perspective-correct texture mapping, typed-array spans, per-pixel depth.</li>
+        <li><b>Coloured lighting.</b> Per-vertex wrapped diffuse from point lights with inverse-square falloff, plus distance fog.</li>
+        <li><b>Sprites.</b> Additive billboards for flame, dust and the seals.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>The portal algebra</h3>
+      <ul>
+        <li><b>Gate frames.</b> A doorway is a rectangle with an origin, two in-plane axes and an outward normal.</li>
+        <li><b>The gluing.</b> X = [−u<sub>B</sub>, v<sub>B</sub>, −n<sub>B</sub>]·[u<sub>A</sub>, v<sub>A</sub>, n<sub>A</sub>]<sup>T</sup> — the identity for two doors back to back, a quarter turn for a bent one.</li>
+        <li><b>Twists.</b> An extra rotation about the far door's own frame. Half a turn each way stands you on the ceiling without turning you round.</li>
+        <li><b>Verification.</b> 82 headless checks: every gluing is a proper rotation, every room is reachable, and the visitor is walked through all four impossibilities.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Everything else</h3>
+      <ul>
+        <li><b>Textures.</b> Value noise, fBm, ridged multifractals, Worley cells and domain warping, written from scratch, generating stone, marble, oak, tile, gilt, tapestry, coffering and the void.</li>
+        <li><b>Sound.</b> A drone of three detuned saws, wind, torch crackle, footsteps, a bell for each seal, and the noise a doorway makes when it bends.</li>
+        <li><b>Movement.</b> Sub-stepped collision against six planes per room, with doorways tested as rectangles in the door's own frame.</li>
+        <li><b>Adaptive quality.</b> The renderer trades resolution for frame rate and settles on its own.</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="foot">
+    <span>The Impossible House — one of the models' answers to one prompt. <a href="https://github.com/stefanjaro/show-me-what-you-can-do">Repository ↗</a></span>
+    <span>52 rooms · 1,673 polygons · 53 doorways · 82 tests</span>
+  </div>
+</section>
+
+<script src="js/core/noise.js"></script>
+<script src="js/core/mathx.js"></script>
+<script src="js/core/textures.js"></script>
+<script src="js/core/render.js"></script>
+<script src="js/world/geom.js"></script>
+<script src="js/world/house.js"></script>
+<script src="js/game/landing.js"></script>
+</body>
+</html>
