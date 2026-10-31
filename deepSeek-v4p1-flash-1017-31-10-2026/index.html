@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Clockwork Mind — A Cabinet of Six Calculating Engines</title>
+<meta name="description" content="Six working machines from the history of computation — a Chinese abacus, the Antikythera mechanism, a slide rule, Babbage's difference engine, the Enigma machine, and a relay adder — rebuilt from scratch in the browser.">
+<meta name="theme-color" content="#0b0a08">
+<meta name="author" content="DeepSeek V4.1 Flash">
+<meta property="og:title" content="The Clockwork Mind — A Cabinet of Six Calculating Engines">
+<meta property="og:description" content="Six working machines from the history of computation, rebuilt from scratch in your browser.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='27' fill='%230b0a08' stroke='%23c9a35a' stroke-width='2'/%3E%3Cg fill='none' stroke='%23c9a35a' stroke-width='2'%3E%3Ccircle cx='32' cy='32' r='14'/%3E%3Cpath d='M32 12v8M32 44v8M12 32h8M44 32h8M18 18l6 6M40 40l6 6M46 18l-6 6M24 40l-6 6'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body id="top">
+
+<a class="skip-link" href="#abacus">Skip to the first machine</a>
+<div class="grain" aria-hidden="true"></div>
+<div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+
+<header class="topbar" id="topbar">
+  <a class="brand" href="#top" aria-label="The Clockwork Mind — back to top">
+    <svg class="brand__mark" viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="19" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="24" cy="24" r="11" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="24" cy="24" r="3.2" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <g stroke="currentColor" stroke-width="1.2">
+        <path d="M24 5v8M24 35v8M5 24h8M35 24h8M10.6 10.6l5.7 5.7M31.7 31.7l5.7 5.7M37.4 10.6l-5.7 5.7M16.3 31.7l-5.7 5.7"/>
+      </g>
+    </svg>
+    <span class="brand__text">The Clockwork Mind</span>
+  </a>
+  <nav class="topbar__nav" aria-label="Exhibits">
+    <a href="#abacus" data-nav="abacus"><b>I</b><span>Counting Frame</span></a>
+    <a href="#antikythera" data-nav="antikythera"><b>II</b><span>Bronze Sky</span></a>
+    <a href="#sliderule" data-nav="sliderule"><b>III</b><span>Slipstick</span></a>
+    <a href="#difference" data-nav="difference"><b>IV</b><span>Difference Engine</span></a>
+    <a href="#enigma" data-nav="enigma"><b>V</b><span>Enigma</span></a>
+    <a href="#relay" data-nav="relay"><b>VI</b><span>Relay Adder</span></a>
+  </nav>
+  <button class="sound-btn" id="sound-toggle" type="button" aria-pressed="false" title="Toggle mechanical sound">
+    <span class="sound-btn__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M4 9v6h4l5 4V5L8 9H4z"/>
+        <path class="sound-wave" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/>
+        <path class="sound-slash" d="M4 4l16 16"/>
+      </svg>
+    </span>
+    <span class="sound-btn__label">Sound off</span>
+  </button>
+</header>
+
+<main>
+
+  <section class="hero" aria-labelledby="hero-title">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="hero__vignette" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="eyebrow__line"></span>A cabinet of six calculating engines</p>
+        <h1 id="hero-title">
+          <span class="hero__the">The</span>
+          <span class="hero__big">Clockwork</span>
+          <span class="hero__mind">Mind</span>
+        </h1>
+        <p class="hero__lede">Before the computer, there were machines that counted, measured the sky, multiplied, predicted, kept secrets, and reasoned. Six of them are working again on this page.</p>
+        <div class="hero__actions">
+          <a class="btn btn--solid" href="#abacus">Enter the cabinet <span class="btn__arrow" aria-hidden="true">↓</span></a>
+          <button class="btn btn--ghost" type="button" data-sound-toggle>Sound: off</button>
+        </div>
+        <p class="hero__meta">Six working models &nbsp;·&nbsp; no libraries &nbsp;·&nbsp; no images</p>
+      </div>
+    </div>
+    <div class="hero__scroll" aria-hidden="true"><span>Scroll</span><i></i></div>
+  </section>
+
+  <nav class="chronology" aria-label="Chronology of the exhibits">
+    <div class="chronology__inner wrap">
+      <a href="#abacus" data-nav="abacus"><span class="chronology__date">before 1600</span><span class="chronology__name">Counting Frame</span><span class="chronology__place">China</span></a>
+      <a href="#antikythera" data-nav="antikythera"><span class="chronology__date">c. 150 BCE</span><span class="chronology__name">Bronze Sky</span><span class="chronology__place">Greece</span></a>
+      <a href="#sliderule" data-nav="sliderule"><span class="chronology__date">1622</span><span class="chronology__name">Slipstick</span><span class="chronology__place">England</span></a>
+      <a href="#difference" data-nav="difference"><span class="chronology__date">1822</span><span class="chronology__name">Difference Engine</span><span class="chronology__place">England</span></a>
+      <a href="#enigma" data-nav="enigma"><span class="chronology__date">1918</span><span class="chronology__name">Enigma</span><span class="chronology__place">Germany</span></a>
+      <a href="#relay" data-nav="relay"><span class="chronology__date">1937</span><span class="chronology__name">Relay Adder</span><span class="chronology__place">United States</span></a>
+    </div>
+  </nav>
+
+  <section class="overture wrap" aria-labelledby="overture-title">
+    <p class="kicker">The cabinet</p>
+    <h2 id="overture-title">Six ways of thinking,<br><em>made of wood, brass and wire.</em></h2>
+    <div class="overture__cols">
+      <p class="dropcap">A calculating machine is an argument made solid. It takes a piece of reasoning — place value, a logarithm, a polynomial, a substitution — and turns it into a shape you can touch. The shape then does the thinking for you.</p>
+      <p>These six are working models, not pictures. Every bead, gear, rotor and relay is drawn and calculated here, in your browser, from scratch. Turn the cranks. Type a message. Make the machines work.</p>
+    </div>
+    <p class="overture__note">No videos. No pre-rendered images. No libraries. Everything below is live.</p>
+  </section>
+
+  <!-- I · ABACUS -->
+  <section class="exhibit" id="abacus" data-exhibit="abacus" aria-labelledby="abacus-title">
+    <div class="exhibit__numeral" aria-hidden="true">I</div>
+    <div class="exhibit__inner wrap">
+      <article class="plaque">
+        <div class="plaque__top"><span class="plaque__no">I</span><span class="plaque__era">China · before 1600</span></div>
+        <h2 id="abacus-title">The Counting<br><em>Frame</em></h2>
+        <p class="plaque__lede">Ten fingers, given places to stand.</p>
+        <div class="plaque__body">
+          <p>The suanpan is a place-value machine you can hear. Each rod carries two beads worth five and five beads worth one. Slide them to the beam and the frame holds a number — not as a symbol, but as a position. Merchants, clerks and astronomers used it for centuries; a skilled hand can beat a pocket calculator.</p>
+        </div>
+        <details class="plaque__details">
+          <summary>How it works</summary>
+          <p>Each rod is a decimal place. A bead above the beam is worth 5; each bead below the beam is worth 1. The value on a rod is the sum of the beads touching the beam. The frame can hold intermediate values above 9, which is useful while carrying. The number shown is the sum of every rod's place value.</p>
+        </details>
+        <p class="plaque__try"><b>Try this.</b> Set the frame to 3,908 and watch the beads find it. Then clear it and try to beat the machine by hand.</p>
+      </article>
+      <div class="cabinet">
+        <div class="cabinet__head"><span>Exhibit I</span><span>Suanpan · thirteen rods</span></div>
+        <div class="cabinet__stage">
+          <canvas id="abacus-canvas" role="img" aria-label="An interactive Chinese suanpan abacus. Set a number with the field below, or move beads with the pointer or arrow keys."></canvas>
+        </div>
+        <div class="machine-ui">
+          <div class="machine-ui__row">
+            <label class="field"><span>Set the frame to</span><input id="abacus-input" type="text" inputmode="numeric" value="8641" autocomplete="off" aria-label="Number to set on the abacus"></label>
+            <button class="btn btn--small btn--solid" id="abacus-set" type="button">Set</button>
+            <button class="btn btn--small btn--quiet" id="abacus-clear" type="button">Clear</button>
+            <button class="btn btn--small btn--quiet" id="abacus-challenge" type="button">Challenge</button>
+          </div>
+          <div class="readout">
+            <div class="readout__cell"><span class="readout__label">Value on the frame</span><span class="readout__big" id="abacus-value" aria-live="polite">0</span></div>
+            <div class="readout__cell readout__cell--wide"><span class="readout__label">Challenge</span><span class="readout__text" id="abacus-challenge-text">Set the number 8,641.</span></div>
+          </div>
+          <p class="hint">Click a bead to move it. Click a rod's beam to clear the rod. Keyboard: ← → choose a rod, ↑ ↓ move beads.</p>
+        </div>
+        <span class="screw screw--tl"></span><span class="screw screw--tr"></span><span class="screw screw--bl"></span><span class="screw screw--br"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- II · ANTIKYTHERA -->
+  <section class="exhibit exhibit--flip" id="antikythera" data-exhibit="antikythera" aria-labelledby="antikythera-title">
+    <div class="exhibit__numeral" aria-hidden="true">II</div>
+    <div class="exhibit__inner wrap">
+      <article class="plaque">
+        <div class="plaque__top"><span class="plaque__no">II</span><span class="plaque__era">Antikythera · Greece · c. 150 BCE</span></div>
+        <h2 id="antikythera-title">The Bronze<br><em>Sky</em></h2>
+        <p class="plaque__lede">A computer built to keep the heavens in order.</p>
+        <div class="plaque__body">
+          <p>In 1901, sponge divers brought up a lump of corroded bronze from a shipwreck near Antikythera. Inside were at least thirty gearwheels, cut with teeth about a millimetre long. The machine followed the Sun and Moon through the zodiac, counted the Metonic and Saros cycles, and predicted eclipses. Nothing else of comparable mechanical complexity survives from the ancient world.</p>
+        </div>
+        <details class="plaque__details">
+          <summary>What you are seeing</summary>
+          <p>This is an interactive reconstruction of the dials and cycles, not a replica of the surviving fragments. The sky is computed with low-precision astronomical formulae. The front dial shows the Sun and Moon; the rear spirals count lunar months and mark eclipse possibilities. Gear tooth counts mentioned in the notes come from published reconstructions. Drag the dial or use the slider to move through time.</p>
+        </details>
+        <p class="plaque__try"><b>Try this.</b> Crank the sky forward and watch the Moon's phase turn. Press “Next eclipse” and see when the dragon's mouth opens.</p>
+      </article>
+      <div class="cabinet">
+        <div class="cabinet__head"><span>Exhibit II</span><span>Reconstruction · front &amp; rear dials</span></div>
+        <div class="cabinet__stage cabinet__stage--ant">
+          <div class="tabs" role="tablist" aria-label="View of the mechanism">
+            <button class="tab is-active" type="button" role="tab" aria-selected="true" data-ant-view="front">Front dial</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-ant-view="back">Rear dials</button>
+          </div>
+          <canvas id="antikythera-canvas" role="img" aria-label="An interactive reconstruction of the Antikythera mechanism's dials. Drag to move through time."></canvas>
+        </div>
+        <div class="machine-ui">
+          <div class="machine-ui__row">
+            <button class="btn btn--small btn--quiet" id="ant-back" type="button" aria-label="Back one month">◀ month</button>
+            <button class="btn btn--small btn--quiet" id="ant-forward" type="button" aria-label="Forward one month">month ▶</button>
+            <button class="btn btn--small btn--solid" id="ant-eclipse" type="button">Next eclipse</button>
+            <button class="btn btn--small btn--quiet" id="ant-play" type="button" aria-pressed="false">Turn time</button>
+          </div>
+          <div class="slider-field">
+            <label for="ant-range">Move through the sky</label>
+            <input id="ant-range" type="range" min="0" max="1000" value="500" step="1">
+          </div>
+          <div class="readout">
+            <div class="readout__cell"><span class="readout__label">Date</span><span class="readout__text" id="ant-date" aria-live="polite">—</span></div>
+            <div class="readout__cell"><span class="readout__label">Sun</span><span class="readout__text" id="ant-sun">—</span></div>
+            <div class="readout__cell"><span class="readout__label">Moon</span><span class="readout__text" id="ant-moon">—</span></div>
+            <div class="readout__cell readout__cell--wide"><span class="readout__label">Sky note</span><span class="readout__text" id="ant-eclipse-status">—</span></div>
+          </div>
+          <p class="hint">Drag across the dial to turn time. The date is shown in the proleptic Julian calendar; the inner ring is the Egyptian civil calendar. Eclipse marks are possibilities, not certainty.</p>
+        </div>
+        <span class="screw screw--tl"></span><span class="screw screw--tr"></span><span class="screw screw--bl"></span><span class="screw screw--br"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- III · SLIDE RULE -->
+  <section class="exhibit" id="sliderule" data-exhibit="sliderule" aria-labelledby="sliderule-title">
+    <div class="exhibit__numeral" aria-hidden="true">III</div>
+    <div class="exhibit__inner wrap">
+      <article class="plaque">
+        <div class="plaque__top"><span class="plaque__no">III</span><span class="plaque__era">England · 1622</span></div>
+        <h2 id="sliderule-title">The<br><em>Slipstick</em></h2>
+        <p class="plaque__lede">Multiplication, folded into a ruler.</p>
+        <div class="plaque__body">
+          <p>William Oughtred placed two logarithmic scales side by side and gave the world a pocket-sized multiplier. To multiply, you slide one scale until its index meets the first number, then read the second number's position against the fixed scale. The answer appears as a distance. Engineers used slide rules to design bridges, aircraft and the Apollo missions; the last slide rules were made in the 1970s.</p>
+        </div>
+        <details class="plaque__details">
+          <summary>How it works</summary>
+          <p>On a logarithmic scale, equal distances are equal ratios. Adding two distances multiplies the numbers. The C and D scales each span one decade; the A and B scales span two. The runner marks a position across the scales. A slide rule gives about three significant figures — it is an instrument of estimation, not exact arithmetic.</p>
+        </details>
+        <p class="plaque__try"><b>Try this.</b> Multiply 3.42 by 7.6. Then square 8.9, or take the square root of 57. Drag the slide and the runner yourself.</p>
+      </article>
+      <div class="cabinet">
+        <div class="cabinet__head"><span>Exhibit III</span><span>Logarithmic rule · C/D · A/B · L</span></div>
+        <div class="cabinet__stage cabinet__stage--rule">
+          <canvas id="sliderule-canvas" role="img" aria-label="An interactive slide rule with A, B, C, D and L scales. Drag the slide or the runner; use the form below to calculate."></canvas>
+        </div>
+        <div class="machine-ui">
+          <div class="machine-ui__row machine-ui__row--wrap">
+            <div class="segmented" role="group" aria-label="Operation">
+              <button class="seg is-active" type="button" data-sr-mode="mul" aria-pressed="true">×</button>
+              <button class="seg" type="button" data-sr-mode="div" aria-pressed="false">÷</button>
+              <button class="seg" type="button" data-sr-mode="sq" aria-pressed="false">x²</button>
+              <button class="seg" type="button" data-sr-mode="sqrt" aria-pressed="false">√</button>
+              <button class="seg" type="button" data-sr-mode="log" aria-pressed="false">log</button>
+            </div>
+            <label class="field field--num" id="sr-a-wrap"><span id="sr-a-label">First number</span><input id="sr-a" type="number" value="3.42" step="any" min="1" max="100" aria-label="First number"></label>
+            <label class="field field--num" id="sr-b-wrap"><span id="sr-b-label">Second number</span><input id="sr-b" type="number" value="7.6" step="any" min="1" max="10" aria-label="Second number"></label>
+            <button class="btn btn--small btn--solid" id="sr-go" type="button">Compute</button>
+          </div>
+          <div class="readout">
+            <div class="readout__cell"><span class="readout__label">Result on the rule</span><span class="readout__big" id="sr-result" aria-live="polite">—</span></div>
+            <div class="readout__cell"><span class="readout__label">Exact</span><span class="readout__text" id="sr-exact">—</span></div>
+            <div class="readout__cell readout__cell--wide"><span class="readout__label">Under the hairline</span><span class="readout__text" id="sr-read">D — · C — · A — · L —</span></div>
+          </div>
+          <p class="hint">Drag the slide or the runner. The exact answer is shown for comparison; the rule reads to about three significant figures.</p>
+        </div>
+        <span class="screw screw--tl"></span><span class="screw screw--tr"></span><span class="screw screw--bl"></span><span class="screw screw--br"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- IV · DIFFERENCE ENGINE -->
+  <section class="exhibit exhibit--flip" id="difference" data-exhibit="difference" aria-labelledby="difference-title">
+    <div class="exhibit__numeral" aria-hidden="true">IV</div>
+    <div class="exhibit__inner wrap">
+      <article class="plaque">
+        <div class="plaque__top"><span class="plaque__no">IV</span><span class="plaque__era">England · 1822</span></div>
+        <h2 id="difference-title">The Difference<br><em>Engine</em></h2>
+        <p class="plaque__lede">A machine for the unglamorous work of tables.</p>
+        <div class="plaque__body">
+          <p>Charles Babbage designed an engine to compute and print mathematical tables without human error. His trick was the finite difference: for any polynomial, the differences between successive values eventually become constant. Feed the machine the first few values, and it can produce the rest by repeated addition — no multiplication required. Babbage's engine was never finished in his lifetime; a complete difference engine was built by the Scheutz brothers in 1853.</p>
+        </div>
+        <details class="plaque__details">
+          <summary>How it works</summary>
+          <p>For a cubic <span class="mono-inline">f(n) = a n³ + b n² + c n + d</span>, the first values and their differences are set on the columns. Each turn of the crank adds the first difference to the value, then adds the second difference to the first, and so on. The rightmost difference stays constant. The printed table is a polynomial, produced one addition at a time.</p>
+        </details>
+        <p class="plaque__try"><b>Try this.</b> Set a, b, c, d to 0, 1, 0, 0 for squares; 0, 0, 1, 0 for a line; or 1, 0, 0, 0 for cubes. Turn the crank and watch the columns settle.</p>
+      </article>
+      <div class="cabinet">
+        <div class="cabinet__head"><span>Exhibit IV</span><span>Finite differences · four columns</span></div>
+        <div class="cabinet__stage">
+          <canvas id="difference-canvas" role="img" aria-label="An interactive difference engine. Turn the crank to generate values of a polynomial."></canvas>
+        </div>
+        <div class="machine-ui">
+          <div class="machine-ui__row machine-ui__row--wrap">
+            <label class="field field--select"><span>Polynomial</span>
+              <select id="de-preset">
+                <option value="0,1,0,0">n² — squares</option>
+                <option value="1,0,0,0">n³ — cubes</option>
+                <option value="0,3,2,1">3n² + 2n + 1</option>
+                <option value="0,2,1,0">2n² + n</option>
+                <option value="custom">custom…</option>
+              </select>
+            </label>
+            <div class="coefs" aria-label="Custom polynomial coefficients">
+              <label class="field field--coef"><span>a</span><input id="de-a" type="number" value="0" min="0" max="9" step="1" aria-label="Coefficient a"></label>
+              <label class="field field--coef"><span>b</span><input id="de-b" type="number" value="1" min="0" max="9" step="1" aria-label="Coefficient b"></label>
+              <label class="field field--coef"><span>c</span><input id="de-c" type="number" value="0" min="0" max="9" step="1" aria-label="Coefficient c"></label>
+              <label class="field field--coef"><span>d</span><input id="de-d" type="number" value="0" min="0" max="9" step="1" aria-label="Coefficient d"></label>
+              <button class="btn btn--small btn--quiet" id="de-load" type="button">Load</button>
+            </div>
+          </div>
+          <div class="machine-ui__row">
+            <button class="btn btn--small btn--solid" id="de-crank" type="button">Turn the crank</button>
+            <button class="btn btn--small btn--quiet" id="de-auto" type="button" aria-pressed="false">Run continuously</button>
+            <button class="btn btn--small btn--quiet" id="de-reset" type="button">Reset</button>
+            <span class="coef-formula mono">f(n) = a n³ + b n² + c n + d</span>
+          </div>
+          <div class="readout">
+            <div class="readout__cell"><span class="readout__label">N</span><span class="readout__big" id="de-n">0</span></div>
+            <div class="readout__cell"><span class="readout__label">f(N)</span><span class="readout__big" id="de-value">0</span></div>
+            <div class="readout__cell readout__cell--wide"><span class="readout__label">Difference columns</span><span class="readout__text" id="de-diffs">—</span></div>
+          </div>
+          <p class="hint">Click the crank or press Space while it is focused. The paper tape records what the engine prints.</p>
+        </div>
+        <span class="screw screw--tl"></span><span class="screw screw--tr"></span><span class="screw screw--bl"></span><span class="screw screw--br"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- V · ENIGMA -->
+  <section class="exhibit" id="enigma" data-exhibit="enigma" aria-labelledby="enigma-title">
+    <div class="exhibit__numeral" aria-hidden="true">V</div>
+    <div class="exhibit__inner wrap">
+      <article class="plaque">
+        <div class="plaque__top"><span class="plaque__no">V</span><span class="plaque__era">Germany · 1918</span></div>
+        <h2 id="enigma-title">The Enigma<br><em>Machine</em></h2>
+        <p class="plaque__lede">A secret that changed every time you pressed a key.</p>
+        <div class="plaque__body">
+          <p>The Enigma was an electric cipher machine: a keyboard, a lampboard, a plugboard and a set of rotating wired wheels. Every keypress sent a current through the wheels and back, lighting a different letter. The rotors stepped with each press, so the same letter never encrypted the same way twice. The German military used it for its most secret traffic. Polish cryptanalysts broke early versions; at Bletchley Park, Alan Turing and his colleagues built machines that broke the rest.</p>
+        </div>
+        <details class="plaque__details">
+          <summary>Why it fell</summary>
+          <p>Enigma had flaws. A letter could never encrypt to itself, which gave codebreakers a foothold. The rotors' double-step created predictable patterns. Most of all, operators repeated messages and used predictable keys. The cipher's keyspace was enormous, but the machine still leaked. This exhibit implements the historical rotor wirings, reflector, plugboard and stepping, including the double step. It is a teaching model, not a secure cipher.</p>
+        </details>
+        <p class="plaque__try"><b>Try this.</b> Type a message on the keyboard below. Then press “Use ciphertext” and run it again with the same settings — Enigma is reciprocal, so the ciphertext turns back into plaintext. Move a rotor and watch the path change.</p>
+      </article>
+      <div class="cabinet">
+        <div class="cabinet__head"><span>Exhibit V</span><span>Enigma I · three rotors · plugboard</span></div>
+        <div class="cabinet__stage cabinet__stage--enigma">
+          <canvas id="enigma-canvas" role="img" aria-label="A live signal-path diagram of the Enigma machine. The path of the current is shown from key to lamp."></canvas>
+        </div>
+        <div class="machine-ui">
+          <div class="rotor-bank" id="enigma-rotors"></div>
+          <div class="enigma-aux">
+            <label class="field field--select"><span>Reflector</span><select id="enigma-reflector"><option value="B">B · wide</option><option value="C">C · narrow</option></select></label>
+            <p class="enigma-aux__note">The reflector sends the signal back through the rotors. It is reciprocal: the same key both locks and unlocks.</p>
+          </div>
+          <div class="enigma-lower">
+            <div class="enigma-plug">
+              <canvas id="enigma-plugboard" role="img" aria-label="Enigma plugboard with sockets and cables. Click two letters to connect them."></canvas>
+              <div class="machine-ui__row machine-ui__row--tight">
+                <label class="field field--grow"><span>Plugboard pairs</span><input id="enigma-plugs" type="text" value="" spellcheck="false" autocomplete="off" placeholder="e.g. AV BS CG"></label>
+                <button class="btn btn--small btn--quiet" id="enigma-plugs-apply" type="button">Apply</button>
+              </div>
+            </div>
+            <div class="enigma-panel">
+              <div class="lampboard" id="enigma-lamps" aria-label="Lampboard"></div>
+              <div class="keyboard" id="enigma-keys" aria-label="Enigma keyboard"></div>
+              <p class="enigma-key-hint">Click the keys, or simply type while the machine is on screen.</p>
+            </div>
+          </div>
+          <div class="machine-ui__row machine-ui__row--wrap">
+            <label class="field field--grow"><span>Message</span><input id="enigma-message" type="text" value="THE CLOCKWORK MIND" spellcheck="false" autocomplete="off" aria-label="Message to encipher"></label>
+            <button class="btn btn--small btn--solid" id="enigma-run" type="button">Encipher</button>
+            <button class="btn btn--small btn--quiet" id="enigma-swap" type="button">Use ciphertext</button>
+            <button class="btn btn--small btn--quiet" id="enigma-clear" type="button">Clear</button>
+          </div>
+          <div class="readout">
+            <div class="readout__cell"><span class="readout__label">Output</span><span class="readout__big readout__big--mono" id="enigma-output" aria-live="polite">—</span></div>
+            <div class="readout__cell"><span class="readout__label">Rotor positions</span><span class="readout__text" id="enigma-pos">—</span></div>
+            <div class="readout__cell"><span class="readout__label">Signal</span><span class="readout__text" id="enigma-state">Ready.</span></div>
+          </div>
+          <p class="hint">The plugboard pairs are reciprocal. Rotor order, ring settings and starting positions all change the key. Spaces are ignored; output is printed in groups of five. The double-step is real.</p>
+        </div>
+        <span class="screw screw--tl"></span><span class="screw screw--tr"></span><span class="screw screw--bl"></span><span class="screw screw--br"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- VI · RELAY ADDER -->
+  <section class="exhibit exhibit--flip" id="relay" data-exhibit="relay" aria-labelledby="relay-title">
+    <div class="exhibit__numeral" aria-hidden="true">VI</div>
+    <div class="exhibit__inner wrap">
+      <article class="plaque">
+        <div class="plaque__top"><span class="plaque__no">VI</span><span class="plaque__era">United States · 1937</span></div>
+        <h2 id="relay-title">The Relay<br><em>Adder</em></h2>
+        <p class="plaque__lede">Logic you can hear.</p>
+        <div class="plaque__body">
+          <p>Before transistors, computers thought with relays: coils that pulled metal contacts open and closed. In 1937, Claude Shannon showed that Boolean algebra could design these circuits — that a network of switches could compute any logical expression. Four full adders in a row make a ripple-carry adder: the carry from one bit wakes the next, like a row of falling dominoes. Early machines such as the Z3 and the Harvard Mark I used relays; they were slow, loud and wonderfully legible.</p>
+        </div>
+        <details class="plaque__details">
+          <summary>How it works</summary>
+          <p>Each full adder takes two input bits and a carry, and produces a sum and a carry out. <span class="mono-inline">Sum = A XOR B XOR Cin</span>. <span class="mono-inline">Carry out = (A AND B) OR (Cin AND (A XOR B))</span>. In subtraction mode the B inputs are inverted and the first carry is set to 1 — two's complement. Watch the carry ripple from the least significant bit to the most significant.</p>
+        </details>
+        <p class="plaque__try"><b>Try this.</b> Set A = 9 and B = 5. Watch the carry travel. Then switch to subtract and try 5 − 9: the result is negative, and the top lamp shows the borrow.</p>
+      </article>
+      <div class="cabinet">
+        <div class="cabinet__head"><span>Exhibit VI</span><span>Relay logic · four-bit ripple carry</span></div>
+        <div class="cabinet__stage">
+          <canvas id="relay-canvas" role="img" aria-label="A relay logic diagram of a four-bit ripple-carry adder. Toggle the inputs below to watch the carry propagate."></canvas>
+        </div>
+        <div class="machine-ui">
+          <div class="relay-inputs">
+            <div class="relay-input-group"><span class="relay-input-label">A</span><div class="bit-row" id="relay-a-bits"></div></div>
+            <div class="relay-input-group"><span class="relay-input-label">B</span><div class="bit-row" id="relay-b-bits"></div></div>
+            <div class="relay-mode" role="group" aria-label="Operation">
+              <button class="seg is-active" type="button" data-relay-mode="add" aria-pressed="true">A + B</button>
+              <button class="seg" type="button" data-relay-mode="sub" aria-pressed="false">A − B</button>
+            </div>
+          </div>
+          <div class="machine-ui__row machine-ui__row--wrap">
+            <label class="field field--num"><span>A (0–15)</span><input id="relay-a-num" type="number" value="9" min="0" max="15" step="1"></label>
+            <label class="field field--num"><span>B (0–15)</span><input id="relay-b-num" type="number" value="5" min="0" max="15" step="1"></label>
+            <button class="btn btn--small btn--quiet" id="relay-random" type="button">Randomize</button>
+            <button class="btn btn--small btn--quiet" id="relay-clear" type="button">Clear</button>
+          </div>
+          <div class="readout">
+            <div class="readout__cell"><span class="readout__label">Result</span><span class="readout__big" id="relay-decimal" aria-live="polite">—</span></div>
+            <div class="readout__cell"><span class="readout__label">Binary</span><span class="readout__big readout__big--mono" id="relay-binary">—</span></div>
+            <div class="readout__cell"><span class="readout__label">Carry / borrow</span><span class="readout__text" id="relay-carry">—</span></div>
+          </div>
+          <p class="hint">Toggle the bits or type a number. The relays settle from right to left; the carry is the bright thread between columns.</p>
+        </div>
+        <span class="screw screw--tl"></span><span class="screw screw--tr"></span><span class="screw screw--bl"></span><span class="screw screw--br"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CODA -->
+  <section class="coda" aria-labelledby="coda-title">
+    <div class="coda__inner wrap">
+      <div class="coda__copy">
+        <p class="kicker">Coda</p>
+        <h2 id="coda-title">Every machine here<br><em>is a thought made external.</em></h2>
+        <p class="coda__lede">The abacus holds a place. The bronze sky holds a cycle. The slide rule holds a ratio. The difference engine holds a polynomial. The Enigma holds a secret. The relay holds a truth table.</p>
+        <p class="coda__lede coda__lede--small">The screen you are reading this on holds all six, and a few billion more.</p>
+        <blockquote class="coda__quote">
+          <p>“The Analytical Engine weaves algebraic patterns just as the Jacquard loom weaves flowers and leaves.”</p>
+          <cite>Ada Lovelace · 1843</cite>
+        </blockquote>
+        <p class="coda__stats mono"><span id="coda-lines">7,824</span> lines of HTML, CSS &amp; JavaScript &nbsp;·&nbsp; 6 machines &nbsp;·&nbsp; 0 libraries &nbsp;·&nbsp; 0 images</p>
+      </div>
+      <div class="coda__machine">
+        <canvas id="coda-canvas" aria-hidden="true"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes" aria-labelledby="notes-title">
+    <div class="wrap">
+      <p class="kicker">Notes &amp; sources</p>
+      <h2 id="notes-title">Small print for large machines.</h2>
+      <div class="notes__cols">
+        <div>
+          <p><strong>Antikythera.</strong> The exhibit is an interactive reconstruction of the dials and cycles, not a replica of the surviving fragments. Celestial positions use low-precision formulae; eclipse marks are possibilities, not predictions. Tooth counts and cycle lengths follow published reconstructions, including Freeth et al. (2006, 2021) and the 2024 calendar-ring study.</p>
+          <p><strong>Enigma.</strong> Historical rotor wirings, reflector B/C, plugboard and stepping are implemented, including the double step. The machine is a teaching model, not a secure cipher. The real Enigma I had five rotors and up to ten plugboard pairs; this model follows that scheme.</p>
+          <p><strong>Difference engine.</strong> The simulation uses the finite-difference method Babbage designed for. The physical engine was never completed in his lifetime; the first complete difference engine was built by the Scheutz brothers in 1853.</p>
+        </div>
+        <div>
+          <p><strong>What is not here.</strong> No external libraries, no images, no video, no network requests at runtime. The typefaces are self-hosted. Every diagram, gear, bead and lamp is drawn with Canvas 2D; every calculation runs in JavaScript on your machine.</p>
+          <p><strong>Typefaces.</strong> Cinzel, Cormorant Garamond and IBM Plex Mono are self-hosted under the SIL Open Font License; the licence text sits in <a href="fonts/OFL.txt">fonts/OFL.txt</a>.</p>
+          <p><strong>Accuracy.</strong> This is a cabinet of working ideas, not a metrology lab. The mechanisms are simplified where history is uncertain and labeled where they are approximations. The pleasure is in the motion, the arithmetic and the long conversation between them.</p>
+          <ul class="sources">
+            <li><a href="https://en.wikipedia.org/wiki/Suanpan" target="_blank" rel="noopener">Suanpan</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Antikythera_mechanism" target="_blank" rel="noopener">Antikythera mechanism</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Slide_rule" target="_blank" rel="noopener">Slide rule</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Difference_engine" target="_blank" rel="noopener">Difference engine</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Enigma_machine" target="_blank" rel="noopener">Enigma machine</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Relay_computer" target="_blank" rel="noopener">Relay computer</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__inner wrap">
+    <div class="footer__brand">
+      <svg class="footer__gear" viewBox="0 0 48 48" aria-hidden="true">
+        <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="1.1"/>
+        <circle cx="24" cy="24" r="9" fill="none" stroke="currentColor" stroke-width="1.1"/>
+        <circle cx="24" cy="24" r="2.6" fill="currentColor"/>
+        <g stroke="currentColor" stroke-width="1.1">
+          <path d="M24 4v9M24 35v9M4 24h9M35 24h9M9.9 9.9l6.4 6.4M31.7 31.7l6.4 6.4M38.1 9.9l-6.4 6.4M16.3 31.7l-6.4 6.4"/>
+        </g>
+      </svg>
+      <span>The Clockwork Mind</span>
+    </div>
+    <p class="footer__line">A cabinet of six calculating engines, built from scratch in one session.</p>
+    <div class="footer__links">
+      <a href="../">All machines ↗</a>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </div>
+</footer>
+
+<noscript>
+  <div class="noscript">This cabinet needs JavaScript to turn its cranks. The machines are all drawn and calculated live in your browser.</div>
+</noscript>
+
+<script src="js/core.js" defer></script>
+<script src="js/audio.js" defer></script>
+<script src="js/hero.js" defer></script>
+<script src="js/abacus.js" defer></script>
+<script src="js/antikythera.js" defer></script>
+<script src="js/sliderule.js" defer></script>
+<script src="js/difference.js" defer></script>
+<script src="js/enigma.js" defer></script>
+<script src="js/relay.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>
