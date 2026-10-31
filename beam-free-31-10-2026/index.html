@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AETHER — a living, ray-marched universe you can rewrite</title>
+<meta name="description" content="A real-time signed-distance-field ray marcher running entirely in your browser. Type a math expression, watch it become a 3D world. Fractals, gyroids, impossible shapes — lit, shadowed, sonified. No libraries, no server.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-mark">AETHER</div>
+    <div class="boot-sub">initialising ray marcher…</div>
+    <div class="boot-bar"><div class="boot-fill"></div></div>
+  </div>
+</div>
+
+<canvas id="gl"></canvas>
+
+<header id="topbar">
+  <div class="brand">
+    <span class="brand-mark">AETHER</span>
+    <span class="brand-sub">live SDF universe</span>
+  </div>
+  <div class="top-controls">
+    <select id="preset" title="Preset scenes"></select>
+    <select id="quality" title="Render quality">
+      <option value="low">Low</option>
+      <option value="med" selected>Medium</option>
+      <option value="high">High</option>
+      <option value="ultra">Ultra</option>
+    </select>
+    <button id="btnAudio" class="pill" title="Toggle audio (A)">Audio</button>
+    <button id="btnPanel" class="pill" title="Toggle panel (P)">Panel</button>
+    <button id="btnHelp" class="pill" title="Help (?)">?</button>
+    <button id="btnShot" class="pill" title="Screenshot (S)">Shot</button>
+  </div>
+</header>
+
+<aside id="panel" class="open">
+  <div class="panel-scroll">
+    <section class="psec">
+      <h3>Scene expression</h3>
+      <p class="hint">A function of <code>x, y, z, t</code> (and <code>u,v</code> mouse). Return signed distance: negative inside, positive outside. Zero is the surface.</p>
+      <textarea id="expr" spellcheck="false" rows="6"></textarea>
+      <div id="err" class="err"></div>
+      <div class="row">
+        <button id="btnApply" class="primary">Apply</button>
+        <button id="btnResetCam">Reset camera</button>
+      </div>
+    </section>
+
+    <section class="psec">
+      <h3>Color mode</h3>
+      <select id="colormode">
+        <option value="normal">Normal</option>
+        <option value="height">Height</option>
+        <option value="depth">Depth</option>
+        <option value="steps">March steps</option>
+        <option value="ao">Ambient occlusion</option>
+        <option value="curvature">Curvature</option>
+        <option value="palette">Palette cycle</option>
+      </select>
+    </section>
+
+    <section class="psec">
+      <h3>Parameters</h3>
+      <div id="sliders"></div>
+    </section>
+
+    <section class="psec">
+      <h3>Lighting</h3>
+      <label>Key azimuth <input type="range" id="lAz" min="0" max="6.283" step="0.01" value="0.9"></label>
+      <label>Key elevation <input type="range" id="lEl" min="-1.5" max="1.5" step="0.01" value="0.6"></label>
+      <label>Exposure <input type="range" id="exposure" min="0.5" max="2.5" step="0.01" value="1.2"></label>
+      <label>Fog <input type="range" id="fog" min="0" max="1" step="0.01" value="0.35"></label>
+      <label>Bloom <input type="range" id="bloom" min="0" max="1" step="0.01" value="0.45"></label>
+    </section>
+
+    <section class="psec">
+      <h3>Animation</h3>
+      <label>Speed <input type="range" id="animSpeed" min="0" max="2" step="0.01" value="0.6"></label>
+      <label><input type="checkbox" id="animOn" checked> Animate time</label>
+      <label><input type="checkbox" id="autoOrbit" > Auto-orbit camera</label>
+    </section>
+
+    <section class="psec">
+      <h3>Share</h3>
+      <div class="row">
+        <button id="btnCopyLink">Copy link</button>
+        <button id="btnImport">Import</button>
+      </div>
+      <input id="importBox" type="text" placeholder="paste share link…" hidden>
+    </section>
+
+    <section class="psec small">
+      <h3>Controls</h3>
+      <ul class="keys">
+        <li>Drag — orbit camera</li>
+        <li>Right-drag / Shift-drag — pan</li>
+        <li>Wheel — zoom</li>
+        <li>Double-click — focus point</li>
+        <li>A — audio, P — panel, S — screenshot, ? — help</li>
+      </ul>
+    </section>
+  </div>
+</aside>
+
+<div id="hud">
+  <span id="fps">-- fps</span>
+  <span id="steps">steps --</span>
+  <span id="status">ready</span>
+</div>
+
+<div id="help" hidden>
+  <div class="help-box">
+    <button id="btnCloseHelp" class="close">×</button>
+    <h2>Writing scenes</h2>
+    <p>Scenes are signed distance functions: a single expression in <code>x, y, z, t</code> (plus <code>u, v</code> for mouse). Negative means inside, positive outside, zero is the surface.</p>
+    <h3>Operators</h3>
+    <p><code>+ - * / ^ %</code> and parentheses. <code>^</code> is power.</p>
+    <h3>Functions</h3>
+    <p><code>sin cos tan asin acos atan atan2 sinh cosh tanh exp log sqrt abs floor ceil round min max pow mod fract clamp mix step smoothstep</code></p>
+    <p><code>len(x,y,z)</code>, <code>dot(ax,ay,az,bx,by,bz)</code>, <code>noise(x,y,z)</code> (value noise), <code>fbm(x,y,z)</code>.</p>
+    <h3>Built-in shapes</h3>
+    <p><code>sphere(x,y,z,r)</code>, <code>box(x,y,z,sx,sy,sz)</code>, <code>torus(x,y,z,R,r)</code>, <code>cylinder(x,y,z,r,h)</code>, <code>plane(x,y,z,nx,ny,nz,d)</code>.</p>
+    <h3>Fractals</h3>
+    <p><code>mandelbulb(x,y,z)</code>, <code>menger(x,y,z)</code>, <code>gyroid(x,y,z,scale)</code>, <code>julia(x,y,z)</code>.</p>
+    <h3>Combining</h3>
+    <p>Union: <code>min(a,b)</code>. Intersection: <code>max(a,b)</code>. Subtraction: <code>max(a,-b)</code>. Smooth union: <code>smin(a,b,k)</code>. Repetition: <code>mod(x, period)-period*0.5</code>.</p>
+    <h3>Examples</h3>
+    <pre>len(x,y,z)-1                          // sphere
+smin(sphere(x,y,z,0.9), box(x,y-0.6,z,0.5,0.5,0.5), 0.3)   // blobby union
+mandelbulb(x,y,z)                     // mandelbulb fractal
+gyroid(x,y,z,1.2)+0.1*sin(t*2)       // animated gyroid
+max(len(x,y,z)-1.2, - (len(x,y,z)-0.9))  // hollow sphere
+noise(x*3,y*3,z*3)*0.3 + len(x,y,z)-1     // bumpy sphere</pre>
+    <p class="note">Recompiling the shader on every keystroke is debounced. Press Apply to force.</p>
+  </div>
+</div>
+
+<script src="shaders.js"></script>
+<script src="audio.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
